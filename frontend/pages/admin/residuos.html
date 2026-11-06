@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resíduos – Admin DF Coleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../../js/tema.js"></script>
+  <link rel="stylesheet" href="../../css/admin.css" />
+  <style>
+    /* Estilos complementares desta tela */
+    .icone-residuo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--admin-primary-light);
+      border: 1px solid var(--admin-primary-tint);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--admin-primary);
+      flex-shrink: 0;
+    }
+    .icone-residuo-badge svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+    .seletor-icones {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+      padding: 10px;
+      background: var(--admin-neutral-bg);
+      border: 1px solid var(--admin-border, var(--admin-card-border));
+      border-radius: var(--admin-radius-sm, 8px);
+    }
+    .btn-icone {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 8px;
+      border: 1px solid var(--admin-border, var(--admin-card-border));
+      background: var(--admin-card-bg);
+      color: var(--admin-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .btn-icone svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+    .btn-icone:hover {
+      border-color: var(--admin-primary-border);
+      color: var(--admin-primary);
+      background: var(--admin-primary-light);
+    }
+    .btn-icone.ativo {
+      background: var(--admin-primary);
+      border-color: var(--admin-primary);
+      color: #ffffff;
+    }
+    .btn-acao-perigo:hover {
+      background-color: var(--admin-danger-bg) !important;
+      color: var(--admin-danger-text) !important;
+      border-color: var(--admin-danger-border) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay Drawer Mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <!-- Toast de Notificações -->
+  <div id="toastNotificacao" class="admin-toast" role="status" aria-live="polite">
+    <i id="toastIcone" data-lucide="check-circle-2"></i>
+    <span id="toastMensagem">Mensagem aqui</span>
+  </div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon"><i data-lucide="recycle"></i></div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button class="admin-sidebar__close-btn" onclick="fecharSidebar()" aria-label="Fechar menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button class="admin-topbar__menu-btn admin-topbar__toggle" onclick="toggleSidebar()" aria-label="Abrir menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__titulo admin-topbar__title">Tipos de Resíduos</h1>
+            <span class="admin-topbar__subtitle">Categorias de materiais recicláveis aceitos nos ecopontos do DF</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar__acoes admin-topbar__right">
+          <button class="admin-btn" onclick="abrirModalCriar()">
+            <i data-lucide="plus"></i>
+            <span>Novo Resíduo</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Cards de Estatísticas -->
+        <div class="admin-stat-grid admin-stat-grid--2">
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Total de Categorias</span>
+              <span class="admin-stat-card__value" id="statTotalResiduos">–</span>
+              <span class="admin-stat-card__meta">Materiais catalogados no sistema</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="recycle"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Filtros Populares</span>
+              <span class="admin-stat-card__value" id="statResiduosPopulares">–</span>
+              <span class="admin-stat-card__meta">Categorias ativas para pesquisa no mapa</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+              <i data-lucide="sparkles"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Busca -->
+        <div class="filtros-card">
+          <div class="filtros-grid">
+            <div class="busca-wrapper">
+              <i data-lucide="search"></i>
+              <input 
+                type="text" 
+                id="inputBusca" 
+                class="admin-input" 
+                placeholder="Filtrar por nome do resíduo ou descrição..." 
+                oninput="aoDigitarBusca()"
+              />
+              <button class="btn-limpar-busca" id="btnLimparBusca" onclick="limparBusca()" title="Limpar busca">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <button class="admin-btn admin-btn--secundario" onclick="limparBusca()" title="Recarregar">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Atualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Resíduos -->
+        <div class="admin-card">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="layers"></i>
+                <span>Materiais Cadastrados</span>
+              </h2>
+              <span class="admin-card__subtitle" id="labelContagemResultados">Carregando categorias...</span>
+            </div>
+          </div>
+
+          <div class="admin-lista" id="listaCategorias">
+            <!-- Skeleton Loading -->
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 160px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 65%; margin-top: 12px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 130px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 70%; margin-top: 12px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 180px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 55%; margin-top: 12px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Criar / Editar Resíduo -->
+  <div class="admin-modal" id="modalResiduo">
+    <div class="admin-modal__box">
+      <div class="admin-modal__header">
+        <h3 class="admin-modal__title" id="modalResiduoTitulo">Novo Tipo de Resíduo</h3>
+        <button class="admin-modal__close" onclick="fecharModalResiduo()" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="formResiduo" onsubmit="salvarResiduo(event)">
+        <input type="hidden" id="residuoId" />
+
+        <div class="admin-form-group">
+          <label class="admin-label">Ícone representativo *</label>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="icone-residuo-badge" id="residuoIconePreview" aria-hidden="true">
+              <i data-lucide="recycle"></i>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--admin-text-light);">
+              Escolha um ícone para representar esta categoria de resíduo.
+            </span>
+          </div>
+
+          <input type="hidden" id="residuoIcone" value="recycle" />
+
+          <div class="seletor-icones" id="seletorIcones">
+            <button type="button" class="btn-icone ativo" data-icone="recycle"      title="Reciclagem"        onclick="selecionarIcone('recycle')"><i data-lucide="recycle"></i></button>
+            <button type="button" class="btn-icone" data-icone="monitor"            title="Eletrônicos"       onclick="selecionarIcone('monitor')"><i data-lucide="monitor"></i></button>
+            <button type="button" class="btn-icone" data-icone="battery-charging"   title="Pilhas e Baterias" onclick="selecionarIcone('battery-charging')"><i data-lucide="battery-charging"></i></button>
+            <button type="button" class="btn-icone" data-icone="droplets"           title="Óleo de Cozinha"   onclick="selecionarIcone('droplets')"><i data-lucide="droplets"></i></button>
+            <button type="button" class="btn-icone" data-icone="package"            title="Papel e Papelão"   onclick="selecionarIcone('package')"><i data-lucide="package"></i></button>
+            <button type="button" class="btn-icone" data-icone="wine"               title="Vidro"             onclick="selecionarIcone('wine')"><i data-lucide="wine"></i></button>
+            <button type="button" class="btn-icone" data-icone="wrench"             title="Metal"             onclick="selecionarIcone('wrench')"><i data-lucide="wrench"></i></button>
+            <button type="button" class="btn-icone" data-icone="pill"               title="Medicamentos"      onclick="selecionarIcone('pill')"><i data-lucide="pill"></i></button>
+            <button type="button" class="btn-icone" data-icone="lightbulb"          title="Lâmpadas"          onclick="selecionarIcone('lightbulb')"><i data-lucide="lightbulb"></i></button>
+            <button type="button" class="btn-icone" data-icone="tv"                 title="TVs Analógicas"    onclick="selecionarIcone('tv')"><i data-lucide="tv"></i></button>
+            <button type="button" class="btn-icone" data-icone="spray-can"          title="Embalagens"        onclick="selecionarIcone('spray-can')"><i data-lucide="spray-can"></i></button>
+            <button type="button" class="btn-icone" data-icone="shirt"              title="Têxtil"            onclick="selecionarIcone('shirt')"><i data-lucide="shirt"></i></button>
+            <button type="button" class="btn-icone" data-icone="leaf"               title="Orgânico"          onclick="selecionarIcone('leaf')"><i data-lucide="leaf"></i></button>
+            <button type="button" class="btn-icone" data-icone="box"                title="Outros"            onclick="selecionarIcone('box')"><i data-lucide="box"></i></button>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="residuoNome">Nome da Categoria *</label>
+          <input 
+            type="text" 
+            id="residuoNome" 
+            class="admin-input" 
+            required 
+            placeholder="Ex: Eletrônicos, Vidro, Óleo de Cozinha" 
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="residuoDescricao">Descrição e Itens Aceitos *</label>
+          <textarea 
+            id="residuoDescricao" 
+            class="admin-textarea" 
+            rows="3" 
+            required 
+            placeholder="Ex: Garrafas PET, potes, frascos e embalagens de limpeza"
+          ></textarea>
+        </div>
+
+        <div class="admin-modal__footer">
+          <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalResiduo()">
+            Cancelar
+          </button>
+          <button type="submit" class="admin-btn" id="btnSalvarResiduo">
+            <i data-lucide="save"></i>
+            <span id="btnSalvarResiduoTexto">Salvar Resíduo</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div class="admin-modal" id="modalExclusao">
+    <div class="admin-modal__box" style="max-width: 440px; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: var(--admin-danger-bg); color: var(--admin-danger-text); display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="alert-triangle" style="width: 28px; height: 28px;"></i>
+        </div>
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Confirmar Exclusão</h3>
+      <p style="font-size: 0.88rem; color: var(--admin-text-muted); line-height: 1.5; margin-bottom: 24px;">
+        Tem certeza que deseja remover a categoria <strong id="nomeResiduoExclusao"></strong>? Esta ação pode impactar os pontos que coletam este material.
+      </p>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalExclusao()">
+          Cancelar
+        </button>
+        <button type="button" class="admin-btn admin-btn--perigo" id="btnConfirmarExclusao" onclick="executarExclusao()">
+          <i data-lucide="trash-2"></i>
+          <span>Sim, Excluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    verificarAuth();
+
+    const API = DF_API_BASE;
+    let todosResiduos = [];
+    let residuoIdParaExcluir = null;
+    let debounceBuscaTimer = null;
+
+    /** Escapa texto vindo da API antes de montar o HTML. */
+    function esc(valor) {
+      return String(valor == null ? '' : valor).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    // Toast de notificação
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const toast = document.getElementById('toastNotificacao');
+      const texto = document.getElementById('toastMensagem');
+      const icone = document.getElementById('toastIcone');
+
+      texto.textContent = mensagem;
+      toast.className = `admin-toast admin-toast--${tipo} visivel`;
+
+      if (tipo === 'sucesso') {
+        icone.setAttribute('data-lucide', 'check-circle-2');
+      } else {
+        icone.setAttribute('data-lucide', 'alert-circle');
+      }
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('visivel');
+      }, 3500);
+    }
+
+    // Carregar Resíduos
+    async function carregarResiduos() {
+      try {
+        const res = await fetch(`${API}/residuos`);
+        const data = await res.json();
+        todosResiduos = Array.isArray(data) ? data : [];
+        aplicarFiltros();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro ao carregar resíduos:', err);
+        document.getElementById('listaCategorias').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon" style="background: var(--admin-danger-bg); color: var(--admin-danger-text);">
+              <i data-lucide="alert-circle"></i>
+            </div>
+            <div class="empty-state__title">Falha ao conectar com a API backend</div>
+            <div class="empty-state__desc">Verifique se o serviço está no ar e recarregue a página.</div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function atualizarEstatisticas() {
+      document.getElementById('statTotalResiduos').textContent = todosResiduos.length;
+      document.getElementById('statResiduosPopulares').textContent = todosResiduos.length;
+    }
+
+    function sincronizarIcone(icone) {
+      const valor = icone || 'recycle';
+      document.getElementById('residuoIcone').value = valor;
+      const preview = document.getElementById('residuoIconePreview');
+      if (preview) preview.innerHTML = `<i data-lucide="${valor}"></i>`;
+      document.querySelectorAll('#seletorIcones .btn-icone').forEach((b) => {
+        b.classList.toggle('ativo', b.dataset.icone === valor);
+      });
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function selecionarIcone(icone) {
+      sincronizarIcone(icone);
+    }
+
+    // Debounce busca
+    function aoDigitarBusca() {
+      const val = document.getElementById('inputBusca').value.trim();
+      document.getElementById('btnLimparBusca').style.display = val ? 'block' : 'none';
+      clearTimeout(debounceBuscaTimer);
+      debounceBuscaTimer = setTimeout(aplicarFiltros, 200);
+    }
+
+    function limparBusca() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      aplicarFiltros();
+    }
+
+    // Filtra e renderiza
+    function aplicarFiltros() {
+      const termo = (document.getElementById('inputBusca').value || '').toLowerCase().trim();
+
+      const filtrados = todosResiduos.filter(r => {
+        if (!termo) return true;
+        const nomeMatch = (r.nome || '').toLowerCase().includes(termo);
+        const descMatch = (r.descricao || '').toLowerCase().includes(termo);
+        return nomeMatch || descMatch;
+      });
+
+      renderizarTabela(filtrados);
+    }
+
+    function renderizarTabela(lista) {
+      const container = document.getElementById('listaCategorias');
+      const label = document.getElementById('labelContagemResultados');
+
+      label.textContent = `Exibindo ${lista.length} de ${todosResiduos.length} categoria(s)`;
+
+      if (lista.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i data-lucide="search-x"></i>
+            </div>
+            <div class="empty-state__title">Nenhuma categoria encontrada</div>
+            <div class="empty-state__desc">Não encontramos nenhum resíduo que coincida com o termo digitado.</div>
+            <button class="admin-btn admin-btn--secundario admin-btn--sm" onclick="limparBusca()" style="margin-top: 8px;">
+              Limpar Busca
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = lista.map(r => `
+        <article class="admin-item">
+          <div class="admin-item__topo">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+              <span class="icone-residuo-badge" title="${esc(r.nome)}">
+                ${iconeResiduoHtml(r)}
+              </span>
+              <div>
+                <span class="admin-item__titulo">${esc(r.nome)}</span>
+                <span class="admin-item__id">#${r.id}</span>
+                <div class="admin-item__desc">${esc(r.descricao || 'Sem descrição cadastrada')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-item__acoes">
+            <button class="admin-btn admin-btn--sm admin-btn--secundario" onclick="abrirModalEditar(${r.id})">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="admin-btn admin-btn--sm admin-btn--secundario btn-acao-perigo" onclick="solicitarExclusao(${r.id})">
+              <i data-lucide="trash-2"></i> Excluir
+            </button>
+          </div>
+        </article>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // Modais
+    function abrirModalCriar() {
+      document.getElementById('modalResiduoTitulo').textContent = 'Novo Tipo de Resíduo';
+      document.getElementById('btnSalvarResiduoTexto').textContent = 'Salvar Resíduo';
+      document.getElementById('residuoId').value = '';
+      document.getElementById('formResiduo').reset();
+      sincronizarIcone('recycle');
+      document.getElementById('modalResiduo').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function abrirModalEditar(id) {
+      const r = todosResiduos.find(x => x.id === id);
+      if (!r) return;
+
+      document.getElementById('modalResiduoTitulo').textContent = `Editar Resíduo #${r.id}`;
+      document.getElementById('btnSalvarResiduoTexto').textContent = 'Atualizar Resíduo';
+      document.getElementById('residuoId').value = r.id;
+      sincronizarIcone(typeof iconeResiduo === 'function' ? iconeResiduo(r) : (r.icone || 'recycle'));
+      document.getElementById('residuoNome').value = r.nome || '';
+      document.getElementById('residuoDescricao').value = r.descricao || '';
+      document.getElementById('modalResiduo').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalResiduo() {
+      document.getElementById('modalResiduo').classList.remove('aberto');
+    }
+
+    // Salvar (POST / PUT)
+    async function salvarResiduo(e) {
+      e.preventDefault();
+      const id = document.getElementById('residuoId').value;
+      const btn = document.getElementById('btnSalvarResiduo');
+      const btnTexto = document.getElementById('btnSalvarResiduoTexto');
+
+      const dto = {
+        icone: document.getElementById('residuoIcone').value || 'recycle',
+        nome: document.getElementById('residuoNome').value.trim(),
+        descricao: document.getElementById('residuoDescricao').value.trim()
+      };
+
+      btn.disabled = true;
+      btnTexto.textContent = 'Salvando...';
+
+      try {
+        const url = id ? `${API}/residuos/${id}` : `${API}/residuos`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dto)
+        });
+
+        if (!res.ok) throw new Error('Falha ao salvar categoria de resíduo');
+
+        mostrarToast(id ? 'Resíduo atualizado com sucesso!' : 'Novo resíduo cadastrado com sucesso!', 'sucesso');
+        fecharModalResiduo();
+        await carregarResiduos();
+      } catch (err) {
+        console.error('Erro ao salvar:', err);
+        mostrarToast('Erro ao salvar resíduo. Verifique os dados.', 'erro');
+      } finally {
+        btn.disabled = false;
+        btnTexto.textContent = id ? 'Atualizar Resíduo' : 'Salvar Resíduo';
+        lucide.createIcons();
+      }
+    }
+
+    // Confirmação e Exclusão
+    function solicitarExclusao(id) {
+      const r = todosResiduos.find(x => x.id === id);
+      if (!r) return;
+
+      residuoIdParaExcluir = id;
+      document.getElementById('nomeResiduoExclusao').textContent = `"${r.nome}"`;
+      document.getElementById('modalExclusao').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalExclusao() {
+      document.getElementById('modalExclusao').classList.remove('aberto');
+      residuoIdParaExcluir = null;
+    }
+
+    async function executarExclusao() {
+      if (!residuoIdParaExcluir) return;
+      const btn = document.getElementById('btnConfirmarExclusao');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/residuos/${residuoIdParaExcluir}`, {
+          method: 'DELETE'
+        });
+
+        if (!res.ok) throw new Error('Falha ao excluir resíduo');
+
+        mostrarToast('Tipo de resíduo removido com sucesso!', 'sucesso');
+        fecharModalExclusao();
+        await carregarResiduos();
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        mostrarToast('Erro ao excluir resíduo', 'erro');
+      } finally {
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    carregarResiduos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pontos de Coleta – DF Coleta</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons + Tema -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../js/tema.js"></script>
+
+  <link rel="stylesheet" href="../css/pages.css" />
+
+  <!-- Navegação única (cabeçalho + rodapé) -->
+  <link rel="stylesheet" href="../css/navegacao.css" />
+</head>
+<body>
+
+  <a href="#conteudo" class="pular-link">Pular para o conteúdo</a>
+
+  <!-- Cabeçalho Padrão -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="../index.html" class="header__brand">
+        <div class="header__brand-icon"><i data-lucide="recycle"></i></div>
+        <span class="header__brand-nome">DF Coleta</span>
+      </a>
+
+      <div class="header__direita">
+        <nav class="header__nav" id="headerNav" aria-label="Navegação principal">
+          <a href="/index.html" class="header__nav-link"><i data-lucide="house"></i> Início</a>
+          <a href="/pages/pontos.html" class="header__nav-link header__nav-link--active" aria-current="page"><i data-lucide="map-pin"></i> Pontos</a>
+          <a href="/pages/sobre.html" class="header__nav-link"><i data-lucide="info"></i> Sobre</a>
+          <a href="/pages/sugestao.html" class="header__nav-link header__nav-link--cta"><i data-lucide="plus"></i> Sugerir</a>
+        </nav>
+        <button class="header__tema" data-toggle-tema type="button" aria-label="Alternar tema" title="Alternar tema"></button>
+        <button class="header__menu-btn" type="button" onclick="toggleMenu(this)" aria-label="Abrir menu" aria-expanded="false" aria-controls="headerNav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="page-hero">
+    <div class="page-hero__badge">
+      <i data-lucide="map-pin"></i>
+      <span>Rede Oficial &amp; Comunitária</span>
+    </div>
+    <h1 class="page-hero__title">Todos os Pontos de Coleta</h1>
+    <p class="page-hero__subtitle">
+      Explore a lista completa de ecopontos, cooperativas e locais de descarte no Distrito Federal.
+    </p>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="page-content" id="conteudo">
+
+    <!-- Card de Busca e Filtros -->
+    <div class="search-filter-card">
+      <div class="search-bar-wrap">
+        <i data-lucide="search" class="search-bar-icon"></i>
+        <label class="visualmente-oculto" for="inputPesquisa">Pesquisar pontos de coleta</label>
+        <input
+          type="text"
+          id="inputPesquisa"
+          class="form-input"
+          placeholder="Pesquisar por nome, quadra ou endereço..."
+          oninput="filtrarErenderizar()"
+        />
+      </div>
+
+      <div class="filters-row">
+        <div>
+          <label class="form-label form-label--sm" for="filtroResiduo">Tipo de Resíduo</label>
+          <select id="filtroResiduo" class="form-select" onchange="filtrarErenderizar()">
+            <option value="">Todos os resíduos</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label form-label--sm" for="filtroTipo">Tipo de Estabelecimento</label>
+          <select id="filtroTipo" class="form-select" onchange="filtrarErenderizar()">
+            <option value="">Todos os tipos</option>
+            <option value="ECOPONTO">Ecoponto</option>
+            <option value="COOPERATIVA">Cooperativa</option>
+            <option value="FARMACIA">Farmácia</option>
+            <option value="COMERCIO">Comércio</option>
+            <option value="COMUNITARIO">Ponto Comunitário</option>
+            <option value="ESCOLA">Escola</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label form-label--sm" for="filtroCidade">Cidade / Região</label>
+          <select id="filtroCidade" class="form-select" onchange="filtrarErenderizar()">
+            <option value="">Todas as cidades</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label form-label--sm" for="ordenacao">Ordenar por</label>
+          <select id="ordenacao" class="form-select" onchange="filtrarErenderizar()">
+            <option value="nome">Nome (A – Z)</option>
+            <option value="proximidade">Mais próximos de você</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso de localização indisponível -->
+    <div
+      id="avisoLocalizacao"
+      hidden
+      style="margin-bottom: 1rem; font-size: 0.875rem; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0.5rem; background: var(--bg-page); border: 1px solid var(--border-light); color: var(--text-secondary);"
+    >
+      <i data-lucide="map-pin-off" style="width: 16px; height: 16px;"></i>
+      <span>Não foi possível obter sua localização. A lista continua em ordem alfabética.</span>
+    </div>
+
+    <style>
+      #avisoLocalizacao:not([hidden]) { display: flex; }
+    </style>
+
+    <!-- Indicador de Total -->
+    <div class="lista-topo">
+      <span id="contadorTexto" class="lista-topo__contador" role="status">Carregando pontos...</span>
+      <button type="button" id="btnLimpar" class="btn-limpar" onclick="limparFiltros()" hidden>
+        <i data-lucide="rotate-ccw"></i> Limpar filtros
+      </button>
+    </div>
+
+    <!-- Lista de Pontos -->
+    <div id="gridPontos" class="lista-pontos">
+      <div class="lista-estado">
+        <i data-lucide="loader-2" class="animate-spin"></i>
+        <p>Buscando pontos de coleta...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Rodapé Padrão -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <i data-lucide="recycle"></i>
+        <span>DF Coleta &copy; 2026</span>
+      </div>
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="/index.html">Início</a>
+        <a href="/pages/pontos.html">Pontos</a>
+        <a href="/pages/sobre.html">Sobre</a>
+        <a href="/pages/sugestao.html">Sugerir Ponto</a>
+        <a href="/pages/admin/login.html" class="footer__lock" title="Área restrita" aria-label="Área restrita"><i data-lucide="lock"></i></a>
+      </nav>
+      <p class="footer__copy">Pela preservação e sustentabilidade do Distrito Federal.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/mapa.js"></script>
+  <script>
+    /**
+     * Escapa texto antes de entrar no HTML (nomes/endereços vêm do banco
+     * e podem ser cadastrados pelo admin).
+     */
+    function escaparHtml(texto) {
+      return String(texto == null ? '' : texto).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    function toggleMenu(btn) {
+      const nav = document.getElementById('headerNav');
+      if (!nav) return;
+      const aberto = nav.classList.toggle('is-open');
+      if (btn) btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
+    let todosPontos = [];
+    let todosResiduos = [];
+    let localizacaoUsuario = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      obterGeolocalizacao();
+
+      try {
+        const [pontos, residuos] = await Promise.all([
+          buscarPontosColeta(),
+          buscarResiduos()
+        ]);
+
+        todosPontos = Array.isArray(pontos) ? pontos : [];
+        todosResiduos = Array.isArray(residuos) ? residuos : [];
+
+        popularFiltros(todosPontos, todosResiduos);
+        filtrarErenderizar();
+      } catch (err) {
+        document.getElementById('gridPontos').innerHTML = `
+          <div class="lista-estado">
+            <i data-lucide="wifi-off"></i>
+            <h3>Não foi possível carregar os pontos</h3>
+            <p>Verifique se o serviço está no ar e tente novamente.</p>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    });
+
+    let geolocalizacaoSolicitada = false;
+
+    function mostrarAvisoLocalizacao(mostrar) {
+      const aviso = document.getElementById('avisoLocalizacao');
+      if (aviso) aviso.hidden = !mostrar;
+    }
+
+    function obterGeolocalizacao() {
+      if (geolocalizacaoSolicitada || localizacaoUsuario) return;
+      geolocalizacaoSolicitada = true;
+
+      if (!('geolocation' in navigator)) {
+        mostrarAvisoLocalizacao(true);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          localizacaoUsuario = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          mostrarAvisoLocalizacao(false);
+          filtrarErenderizar();
+        },
+        (err) => {
+          console.log('Geolocalização não autorizada:', err.message);
+          mostrarAvisoLocalizacao(true);
+        },
+        { timeout: 5000 }
+      );
+    }
+
+    function popularFiltros(pontos, residuos) {
+      const selResiduo = document.getElementById('filtroResiduo');
+      (residuos || []).forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = r.nome;
+        selResiduo.appendChild(opt);
+      });
+
+      const selCidade = document.getElementById('filtroCidade');
+      const cidades = [...new Set((pontos || []).map(p => p.cidade).filter(Boolean))].sort();
+      cidades.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        selCidade.appendChild(opt);
+      });
+    }
+
+    function limparFiltros() {
+      document.getElementById('inputPesquisa').value = '';
+      document.getElementById('filtroResiduo').value = '';
+      document.getElementById('filtroTipo').value = '';
+      document.getElementById('filtroCidade').value = '';
+      document.getElementById('ordenacao').value = 'nome';
+      filtrarErenderizar();
+    }
+
+    function filtrarErenderizar() {
+      const busca = (document.getElementById('inputPesquisa').value || '').toLowerCase().trim();
+      const residuoId = document.getElementById('filtroResiduo').value;
+      const tipo = document.getElementById('filtroTipo').value;
+      const cidade = document.getElementById('filtroCidade').value;
+      const ordenacao = document.getElementById('ordenacao').value;
+
+      const temFiltro = Boolean(busca || residuoId || tipo || cidade);
+      document.getElementById('btnLimpar').hidden = !temFiltro && ordenacao === 'nome';
+
+      let resultado = todosPontos.filter(p => {
+        const atendeBusca = !busca
+          || (p.nome || '').toLowerCase().includes(busca)
+          || (p.endereco || '').toLowerCase().includes(busca);
+        const atendeTipo = !tipo || String(p.tipo || '').toUpperCase() === tipo;
+        const atendeCidade = !cidade || p.cidade === cidade;
+        const atendeResiduo = !residuoId || (p.residuos || []).some(r => String(r.id) === String(residuoId));
+        return atendeBusca && atendeTipo && atendeCidade && atendeResiduo;
+      });
+
+      if (ordenacao === 'proximidade' && !localizacaoUsuario) {
+        obterGeolocalizacao();
+      }
+
+      if (ordenacao === 'proximidade' && localizacaoUsuario && typeof calcularDistancia === 'function') {
+        resultado.sort((a, b) => {
+          const distA = a.latitude ? calcularDistancia(localizacaoUsuario.lat, localizacaoUsuario.lng, a.latitude, a.longitude) : 99999;
+          const distB = b.latitude ? calcularDistancia(localizacaoUsuario.lat, localizacaoUsuario.lng, b.latitude, b.longitude) : 99999;
+          return distA - distB;
+        });
+      } else {
+        resultado.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+      }
+
+      document.getElementById('contadorTexto').textContent =
+        `${resultado.length} ${resultado.length === 1 ? 'ponto encontrado' : 'pontos encontrados'}`;
+
+      const container = document.getElementById('gridPontos');
+      if (resultado.length === 0) {
+        container.innerHTML = `
+          <div class="lista-estado">
+            <i data-lucide="search-x"></i>
+            <h3>Nenhum ponto encontrado</h3>
+            <p>Tente ajustar a busca ou remover os filtros aplicados.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = resultado.map(p => {
+        const residuos = p.residuos || [];
+
+        let distHtml = '';
+        if (localizacaoUsuario && p.latitude && p.longitude && typeof calcularDistancia === 'function') {
+          const d = calcularDistancia(localizacaoUsuario.lat, localizacaoUsuario.lng, p.latitude, p.longitude);
+          distHtml = `<span class="badge badge--distancia"><i data-lucide="navigation"></i> ${d.toFixed(1).replace('.', ',')} km</span>`;
+        }
+
+        const tags = residuos.slice(0, 4).map(r => `
+          <span class="ponto-list-card__tag">
+            ${iconeResiduoHtml(r)}
+            ${escaparHtml(r.nome)}
+          </span>
+        `).join('');
+
+        const maisTags = residuos.length > 4
+          ? `<span class="ponto-list-card__mais">+${residuos.length - 4}</span>`
+          : '';
+
+        const iconePrincipal = residuos.length ? iconeResiduoHtml(residuos[0]) : '<i data-lucide="map-pin"></i>';
+
+        return `
+          <a class="ponto-list-card" href="ponto-detalhe.html?id=${encodeURIComponent(p.id)}">
+            <span class="ponto-list-card__icone">${iconePrincipal}</span>
+            <div class="ponto-list-card__corpo">
+              <div class="ponto-list-card__topo">
+                <h3 class="ponto-list-card__title">${escaparHtml(p.nome)}</h3>
+                ${distHtml}
+              </div>
+              <p class="ponto-list-card__address">
+                <i data-lucide="map-pin"></i>
+                <span>${escaparHtml(p.endereco)}${p.cidade ? `, ${escaparHtml(p.cidade)}` : ''}</span>
+              </p>
+              <div class="ponto-list-card__tags">
+                ${tags}
+                ${maisTags}
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

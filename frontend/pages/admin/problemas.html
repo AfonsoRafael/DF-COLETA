@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problemas Relatados – Admin DF Coleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../../js/tema.js"></script>
+  <link rel="stylesheet" href="../../css/admin.css" />
+</head>
+<body>
+  <!-- Overlay Drawer Mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <!-- Toast -->
+  <div id="toastNotificacao" class="admin-toast" role="status" aria-live="polite">
+    <i id="toastIcone" data-lucide="check-circle-2"></i>
+    <span id="toastMensagem">Mensagem</span>
+  </div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon"><i data-lucide="recycle"></i></div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button class="admin-sidebar__close-btn" onclick="fecharSidebar()" aria-label="Fechar menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button class="admin-topbar__menu-btn admin-topbar__toggle" onclick="toggleSidebar()" aria-label="Abrir menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__titulo admin-topbar__title">Problemas Relatados</h1>
+            <span class="admin-topbar__subtitle">Acompanhe os relatos da comunidade e marque cada um como resolvido</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar__acoes admin-topbar__right">
+          <button class="admin-btn admin-btn--secundario" onclick="carregarProblemas()" title="Atualizar dados">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Estatísticas -->
+        <div class="admin-stat-grid admin-stat-grid--4">
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Total de Relatos</span>
+              <span class="admin-stat-card__value" id="statTotal">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+              <i data-lucide="alert-triangle"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Pendentes</span>
+              <span class="admin-stat-card__value" id="statPendentes">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--amarelo">
+              <i data-lucide="clock"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Em Análise</span>
+              <span class="admin-stat-card__value" id="statAnalise">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--roxo">
+              <i data-lucide="search"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Resolvidos</span>
+              <span class="admin-stat-card__value" id="statResolvidos">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Busca e filtros -->
+        <div class="filtros-card">
+          <div class="filtros-grid">
+            <div class="busca-wrapper">
+              <i data-lucide="search"></i>
+              <input
+                type="text"
+                id="inputBusca"
+                class="admin-input"
+                placeholder="Buscar por autor ou texto do relato..."
+                oninput="aoDigitarBusca()"
+              />
+              <button class="btn-limpar-busca" id="btnLimparBusca" onclick="limparBusca()" title="Limpar busca">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <select id="filtroStatus" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todos os Status</option>
+              <option value="pendente">Pendente</option>
+              <option value="analise">Em Análise</option>
+              <option value="resolvido">Resolvido</option>
+            </select>
+
+            <button class="admin-btn admin-btn--secundario" onclick="limparFiltros()" title="Limpar todos os filtros">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista -->
+        <div class="admin-card">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="list"></i>
+                <span>Problemas Recebidos</span>
+              </h2>
+              <span class="admin-card__subtitle" id="labelContagemResultados">Carregando registros...</span>
+            </div>
+          </div>
+
+          <div class="admin-lista" id="listaProblemas">
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 180px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 55%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 35%; margin-top: 8px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 150px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 50%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 40%; margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    verificarAuth();
+
+    let todosProblemas = [];
+
+    /* Espelho local do status vindo da API (persistido no Supabase). */
+    const statusLocal = {};
+
+    const STATUS = {
+      pendente:  { classe: 'admin-badge--pendente', rotulo: 'Pendente' },
+      analise:   { classe: 'admin-badge--cinza',    rotulo: 'Em análise' },
+      resolvido: { classe: 'admin-badge--sucesso',  rotulo: 'Resolvido' },
+    };
+
+    /* O backend grava o andamento em maiúsculas (EM_ANALISE, RESOLVIDO...). */
+    const STATUS_API = {
+      PENDENTE: 'pendente',
+      EM_ANALISE: 'analise',
+      RESOLVIDO: 'resolvido',
+    };
+
+    const SEVERIDADE = { BAIXA: 'Baixa', MEDIA: 'Média', ALTA: 'Alta' };
+
+    /** Escapa texto vindo da API antes de montar o HTML. */
+    function esc(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    function statusDoItem(problema) {
+      if (statusLocal[problema.id]) return statusLocal[problema.id];
+      return STATUS_API[String(problema.status || '').toUpperCase()] || 'pendente';
+    }
+
+    function dataCurta(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const toast = document.getElementById('toastNotificacao');
+      const texto = document.getElementById('toastMensagem');
+      const icone = document.getElementById('toastIcone');
+
+      texto.textContent = mensagem;
+      toast.className = `admin-toast admin-toast--${tipo} visivel`;
+      icone.setAttribute('data-lucide', tipo === 'sucesso' ? 'check-circle-2' : 'alert-circle');
+      lucide.createIcons();
+
+      setTimeout(() => toast.classList.remove('visivel'), 3500);
+    }
+
+    async function carregarProblemas() {
+      const container = document.getElementById('listaProblemas');
+      try {
+        const dados = await requisicao('/problemas');
+        todosProblemas = Array.isArray(dados) ? dados : [];
+        aplicarFiltros();
+      } catch (erro) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon" style="background: var(--admin-danger-bg); color: var(--admin-danger-text);">
+              <i data-lucide="plug-zap"></i>
+            </div>
+            <div class="empty-state__title">Falha ao conectar com a API</div>
+            <div class="empty-state__desc">Verifique se o backend está no ar e tente novamente.</div>
+          </div>`;
+        document.getElementById('labelContagemResultados').textContent = 'Sem conexão com o servidor';
+        lucide.createIcons();
+      }
+    }
+
+    function atualizarEstatisticas() {
+      const conta = (status) => todosProblemas.filter((p) => statusDoItem(p) === status).length;
+      document.getElementById('statTotal').textContent = todosProblemas.length;
+      document.getElementById('statPendentes').textContent = conta('pendente');
+      document.getElementById('statAnalise').textContent = conta('analise');
+      document.getElementById('statResolvidos').textContent = conta('resolvido');
+    }
+
+    function aplicarFiltros() {
+      const status = document.getElementById('filtroStatus').value;
+      const texto = document.getElementById('inputBusca').value.trim().toLowerCase();
+
+      const filtrados = todosProblemas.filter((p) => {
+        const autor = String(p.nomeAutor || p.nome_autor || '').toLowerCase();
+        const corpo = String(p.textoProblema || p.texto_problema || p.descricao || '').toLowerCase();
+        const okStatus = !status || statusDoItem(p) === status;
+        const okTexto = !texto || autor.includes(texto) || corpo.includes(texto);
+        return okStatus && okTexto;
+      });
+
+      atualizarEstatisticas();
+      renderizar(filtrados);
+    }
+
+    function renderizar(lista) {
+      const container = document.getElementById('listaProblemas');
+      const rotulo = document.getElementById('labelContagemResultados');
+
+      if (lista.length === 1) {
+        rotulo.textContent = '1 registro encontrado';
+      } else if (lista.length !== todosProblemas.length) {
+        rotulo.textContent = `${lista.length} de ${todosProblemas.length} registros`;
+      } else {
+        rotulo.textContent = `${lista.length} registro${lista.length === 1 ? '' : 's'} encontrado${lista.length === 1 ? '' : 's'}`;
+      }
+
+      if (!lista.length) {
+        const semDados = todosProblemas.length === 0;
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i data-lucide="${semDados ? 'party-popper' : 'search-x'}"></i>
+            </div>
+            <div class="empty-state__title">${semDados ? 'Nenhum problema relatado' : 'Nenhum resultado encontrado'}</div>
+            <div class="empty-state__desc">
+              ${semDados
+                ? 'Ótimo sinal: nenhum problema foi reportado pela comunidade até agora.'
+                : 'Ajuste a busca ou o filtro de status para ver outros relatos.'}
+            </div>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = lista.map((p) => {
+        const status = statusDoItem(p);
+        const info = STATUS[status];
+        const ponto = p.pontoColetaId || p.ponto_coleta_id;
+        const autor = p.nomeAutor || p.nome_autor || 'Anônimo';
+        const email = p.emailAutor || p.email_autor || '';
+        const texto = p.textoProblema || p.texto_problema || p.descricao || '—';
+        const severidade = SEVERIDADE[String(p.severidade || '').toUpperCase()] || '';
+
+        const acoes = status === 'resolvido'
+          ? `<button class="admin-btn admin-btn--sm admin-btn--secundario" onclick="marcarStatus(${p.id}, 'pendente')">
+               <i data-lucide="rotate-ccw"></i> Reabrir
+             </button>`
+          : `${status !== 'analise'
+                ? `<button class="admin-btn admin-btn--sm admin-btn--secundario" onclick="marcarStatus(${p.id}, 'analise')">
+                     <i data-lucide="clock"></i> Em Análise
+                   </button>`
+                : ''}
+             <button class="admin-btn admin-btn--sm" onclick="marcarStatus(${p.id}, 'resolvido')">
+               <i data-lucide="check"></i> Marcar Resolvido
+             </button>`;
+
+        return `
+          <article class="admin-item">
+            <div class="admin-item__topo">
+              <div>
+                <span class="admin-item__titulo">${esc(autor)}</span>
+                <span class="admin-item__id">#${esc(p.id)}</span>
+                ${email ? `<div class="admin-item__desc">${esc(email)}</div>` : ''}
+              </div>
+              <span class="admin-badge ${info.classe}">${info.rotulo}</span>
+            </div>
+
+            <div class="admin-item__meta">
+              <span><i data-lucide="calendar"></i> ${dataCurta(p.data)}</span>
+              ${ponto ? `<span><i data-lucide="map-pin"></i> Ponto #${esc(ponto)}</span>` : ''}
+              ${p.tipo_problema ? `<span><i data-lucide="tag"></i> ${esc(p.tipo_problema)}</span>` : ''}
+              ${severidade ? `<span><i data-lucide="gauge"></i> Severidade ${severidade.toLowerCase()}</span>` : ''}
+            </div>
+
+            <p class="admin-item__texto">${esc(texto)}</p>
+
+            <div class="admin-item__acoes">${acoes}</div>
+          </article>`;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    const STATUS_PARA_API = {
+      pendente: 'PENDENTE',
+      analise: 'EM_ANALISE',
+      resolvido: 'RESOLVIDO',
+    };
+
+    async function marcarStatus(id, novoStatus) {
+      try {
+        await requisicao(`/problemas/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: STATUS_PARA_API[novoStatus] }),
+        });
+
+        statusLocal[id] = novoStatus;
+        aplicarFiltros();
+        mostrarToast(`Relato #${id} marcado como ${STATUS[novoStatus].rotulo.toLowerCase()}.`);
+      } catch (erro) {
+        mostrarToast(`Falha ao atualizar o relato: ${erro.message}`, 'erro');
+      }
+    }
+
+    function aoDigitarBusca() {
+      const valor = document.getElementById('inputBusca').value.trim();
+      document.getElementById('btnLimparBusca').style.display = valor ? 'block' : 'none';
+      aplicarFiltros();
+    }
+
+    function limparBusca() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      aplicarFiltros();
+    }
+
+    function limparFiltros() {
+      document.getElementById('filtroStatus').value = '';
+      limparBusca();
+    }
+
+    carregarProblemas();
+  </script>
+</body>
+</html>

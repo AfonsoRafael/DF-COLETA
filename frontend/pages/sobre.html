@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre o Projeto – DF Coleta</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../js/tema.js"></script>
+
+  <!-- CSS do Design System -->
+  <link rel="stylesheet" href="../css/pages.css" />
+
+  <!-- Navegação única (cabeçalho + rodapé) -->
+  <link rel="stylesheet" href="../css/navegacao.css" />
+</head>
+<body>
+
+  <a href="#conteudo" class="pular-link">Pular para o conteúdo</a>
+
+  <!-- Cabeçalho Padrão -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="../index.html" class="header__brand">
+        <div class="header__brand-icon"><i data-lucide="recycle"></i></div>
+        <span class="header__brand-nome">DF Coleta</span>
+      </a>
+      <div class="header__direita">
+        <nav class="header__nav" id="headerNav" aria-label="Navegação principal">
+          <a href="/index.html" class="header__nav-link"><i data-lucide="house"></i> Início</a>
+          <a href="/pages/pontos.html" class="header__nav-link"><i data-lucide="map-pin"></i> Pontos</a>
+          <a href="/pages/sobre.html" class="header__nav-link header__nav-link--active" aria-current="page"><i data-lucide="info"></i> Sobre</a>
+          <a href="/pages/sugestao.html" class="header__nav-link header__nav-link--cta"><i data-lucide="plus"></i> Sugerir</a>
+        </nav>
+        <button class="header__tema" data-toggle-tema type="button" aria-label="Alternar tema" title="Alternar tema"></button>
+        <button class="header__menu-btn" type="button" onclick="toggleMenu(this)" aria-label="Abrir menu" aria-expanded="false" aria-controls="headerNav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="page-hero">
+    <div class="page-hero__badge">
+      <i data-lucide="sparkles"></i>
+      <span>Iniciativa Cidadã e Sustentável</span>
+    </div>
+    <h1 class="page-hero__title">Sobre o DF Coleta</h1>
+    <p class="page-hero__subtitle">
+      Conectando moradores do Distrito Federal aos pontos de descarte correto, fortalecendo a reciclagem e preservando o nosso Cerrado.
+    </p>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="page-content" id="conteudo">
+
+    <!-- Seção Missão -->
+    <section class="card-section card-section--missao">
+      <div class="card-section__header">
+        <span class="card-section__rotulo">
+          <i data-lucide="target"></i>
+          Nossa missão
+        </span>
+        <h2 class="card-section__title">Por que o descarte correto transforma o DF?</h2>
+      </div>
+
+      <div class="missao">
+        <div class="missao__texto">
+          <p>
+            Diariamente, o Distrito Federal gera milhares de toneladas de resíduos sólidos. Embora grande parte desse volume seja composta por materiais recicláveis e itens que demandam logística reversa — como eletrônicos, pilhas, medicamentos vencidos e óleo de fritura —, muitos ainda acabam descartados de forma incorreta no lixo comum, contaminando o solo e sobrecarregando o sistema de limpeza pública.
+          </p>
+
+          <blockquote class="missao__citacao">
+            <i data-lucide="quote"></i>
+            <p>
+              Facilitar o acesso da população às informações sobre ecopontos e locais de entrega voluntária é o primeiro passo para transformar consciência ambiental em ação prática.
+            </p>
+          </blockquote>
+
+          <p>
+            O <strong>DF Coleta</strong> nasceu como uma plataforma aberta e comunitária com o objetivo de centralizar e descomplicar o acesso a esses pontos. Ao mapear ecopontos oficiais do SLU, cooperativas de catadores locais, farmácias com coletores e pontos de entrega de parceiros em diversas regiões administrativas, tornamos o ato de reciclar simples, rápido e ao alcance de todos.
+          </p>
+
+          <p>
+            Mais do que tecnologia, nosso projeto fomenta a economia circular e a inclusão social no Distrito Federal. Cada quilograma de material encaminhado ao destino adequado apoia a renda de famílias de cooperativas de reciclagem, reduz a pressão sobre o aterro sanitário e protege as bacias hidrográficas vitais que abastecem a capital de todos os brasileiros.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Como Funciona -->
+    <section class="card-section">
+      <div class="card-section__header">
+        <span class="card-section__rotulo">
+          <i data-lucide="route"></i>
+          Como funciona
+        </span>
+        <h2 class="card-section__title">Três passos até o descarte certo</h2>
+        <p class="card-section__subtitle">Etapas simples para dar a destinação correta aos seus resíduos</p>
+      </div>
+
+      <ol class="passos">
+        <li class="passo">
+          <span class="passo__numero">Passo 01</span>
+          <h3 class="passo__titulo"><i data-lucide="search"></i> Encontre</h3>
+          <p class="passo__texto">
+            Busque pontos no mapa interativo por proximidade, cidade/região ou pelo tipo exato de resíduo que você deseja descartar.
+          </p>
+        </li>
+
+        <li class="passo">
+          <span class="passo__numero">Passo 02</span>
+          <h3 class="passo__titulo"><i data-lucide="navigation"></i> Navegue</h3>
+          <p class="passo__texto">
+            Consulte horários de funcionamento, contatos, resíduos aceitos e trace rotas diretas até o ponto usando o Google Maps.
+          </p>
+        </li>
+
+        <li class="passo">
+          <span class="passo__numero">Passo 03</span>
+          <h3 class="passo__titulo"><i data-lucide="recycle"></i> Descarte</h3>
+          <p class="passo__texto">
+            Leve seus materiais com segurança até o local correto e ajude a fortalecer a cadeia sustentável do Distrito Federal.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Estatísticas -->
+    <section class="card-section">
+      <div class="card-section__header">
+        <span class="card-section__rotulo">
+          <i data-lucide="activity"></i>
+          Impacto
+        </span>
+        <h2 class="card-section__title">Nosso impacto em números</h2>
+        <p class="card-section__subtitle">Dados atualizados da rede de pontos e alcance no Distrito Federal</p>
+      </div>
+
+      <div class="numeros">
+        <div class="numero">
+          <span class="numero__valor">11+</span>
+          <span class="numero__rotulo"><i data-lucide="map-pin"></i> Pontos cadastrados</span>
+        </div>
+
+        <div class="numero">
+          <span class="numero__valor">10</span>
+          <span class="numero__rotulo"><i data-lucide="package"></i> Tipos de resíduos</span>
+        </div>
+
+        <div class="numero">
+          <span class="numero__valor">6+</span>
+          <span class="numero__rotulo"><i data-lucide="map"></i> Regiões do DF</span>
+        </div>
+
+        <div class="numero">
+          <span class="numero__valor">100%</span>
+          <span class="numero__rotulo"><i data-lucide="heart-handshake"></i> Gratuito e acessível</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alinhamento com os ODS da Agenda 2030 -->
+    <section class="card-section">
+      <div class="card-section__header">
+        <span class="card-section__rotulo">
+          <i data-lucide="globe"></i>
+          Agenda 2030 da ONU
+        </span>
+        <h2 class="card-section__title">Os ODS que o DF Coleta ajuda a cumprir</h2>
+        <p class="card-section__subtitle">
+          Dois Objetivos de Desenvolvimento Sustentável resumem o impacto do projeto — e o papel do software como instrumento de política ambiental.
+        </p>
+      </div>
+
+      <ol class="ods-lista">
+        <!-- ODS principal -->
+        <li class="ods-item ods-item--11">
+          <div class="ods-item__marca">
+            <span class="ods-item__numero">11</span>
+            <span class="ods-item__rotulo">ODS principal</span>
+          </div>
+
+          <div class="ods-item__corpo">
+            <h3 class="ods-item__titulo">Cidades e Comunidades Sustentáveis</h3>
+
+            <p class="ods-item__texto">
+              Todo resíduo mal descartado ocupa espaço no aterro, entope bueiros e agrava enchentes. Quando a cidade não sabe onde descartar, o material acaba em terrenos vazios e às margens de córregos. O DF Coleta ataca essa lacuna de informação: reúne os pontos que já existem e os apresenta de forma clara, com tipo de resíduo, horário e localização. O descarte deixa de depender de conhecimento prévio ou de sorte e passa a ser uma escolha possível para qualquer morador.
+            </p>
+
+            <p class="ods-item__texto">
+              O ganho é urbano: menos volume em via pública, menos pontos de descarte irregular e uma rede de coleta seletiva mais bem aproveitada. Os dados também servem de base para o poder público identificar onde faltam pontos e onde a estrutura existente precisa ser reforçada.
+            </p>
+
+            <ul class="ods-item__metas">
+              <li><i data-lucide="target"></i> Meta 11.6 — reduzir o impacto ambiental negativo das cidades, inclusive na gestão de resíduos</li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- ODS secundário -->
+        <li class="ods-item ods-item--12">
+          <div class="ods-item__marca">
+            <span class="ods-item__numero">12</span>
+            <span class="ods-item__rotulo">ODS 12</span>
+          </div>
+
+          <div class="ods-item__corpo">
+            <h3 class="ods-item__titulo">Consumo e Produção Responsáveis</h3>
+
+            <p class="ods-item__texto">
+              Reciclar só funciona quando o material chega limpo e separado ao lugar certo. O DF Coleta ajuda nessa etapa ao informar o que cada ponto aceita, evitando que recicláveis sejam misturados ao lixo comum e que resíduos perigosos — pilhas, eletrônicos e óleo de cozinha — contaminem o restante. A plataforma também aproxima quem descarta das cooperativas e iniciativas de logística reversa, mantendo o material em circulação em vez de enterrá-lo.
+            </p>
+
+            <p class="ods-item__texto">
+              É a parte prática da economia circular: o resíduo deixa de ser sobra e volta a ser insumo. Cada embalagem, equipamento ou óleo encaminhado corretamente reduz a extração de matéria-prima nova e prolonga a vida útil dos aterros do Distrito Federal.
+            </p>
+
+            <ul class="ods-item__metas">
+              <li><i data-lucide="target"></i> Meta 12.5 — reduzir a geração de resíduos por meio da prevenção, redução, reciclagem e reutilização</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Chamada final -->
+    <section class="card-section">
+      <div class="chamada">
+        <div class="chamada__texto">
+          <h2 class="chamada__titulo">Faça parte desse movimento</h2>
+          <p class="chamada__desc">
+            Encontre o ponto mais próximo de você agora mesmo ou contribua sugerindo novos locais de coleta na sua quadra ou cidade.
+          </p>
+        </div>
+
+        <div class="chamada__acoes">
+          <a href="/index.html" class="btn btn--white btn--lg">
+            <i data-lucide="map"></i>
+            Explorar o mapa
+          </a>
+          <a href="/pages/sugestao.html" class="btn btn--outline btn--lg">
+            <i data-lucide="plus"></i>
+            Sugerir um ponto
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Rodapé Padrão -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <i data-lucide="recycle"></i>
+        <span>DF Coleta &copy; 2026</span>
+      </div>
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="/index.html">Início</a>
+        <a href="/pages/pontos.html">Pontos</a>
+        <a href="/pages/sobre.html">Sobre</a>
+        <a href="/pages/sugestao.html">Sugerir Ponto</a>
+        <a href="/pages/admin/login.html" class="footer__lock" title="Área restrita" aria-label="Área restrita"><i data-lucide="lock"></i></a>
+      </nav>
+      <p class="footer__copy">Pela preservação e sustentabilidade do Distrito Federal.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    function toggleMenu(btn) {
+      const nav = document.getElementById('headerNav');
+      if (!nav) return;
+      const aberto = nav.classList.toggle('is-open');
+      if (btn) btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
+    // Inicializa ícones Lucide
+    lucide.createIcons();
+  </script>
+</body>
+</html>

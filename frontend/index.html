@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DF Coleta – Encontre pontos de coleta no Distrito Federal</title>
+  <meta name="description" content="Encontre o ponto de coleta ideal para cada tipo de resíduo no Distrito Federal: eletrônicos, pilhas, óleo, vidro, medicamentos e mais." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons + Tema -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="js/tema.js"></script>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/index.css" />
+
+  <!-- Navegação única (cabeçalho + rodapé) -->
+  <link rel="stylesheet" href="css/navegacao.css" />
+</head>
+<body class="app-body">
+
+  <a href="#conteudo" class="pular-link">Pular para o conteúdo</a>
+
+  <!-- ===================== CABEÇALHO (único do site) ===================== -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="/index.html" class="header__brand">
+        <div class="header__brand-icon"><i data-lucide="recycle"></i></div>
+        <span class="header__brand-nome">DF Coleta</span>
+      </a>
+
+      <div class="header__direita">
+        <nav class="header__nav" id="headerNav" aria-label="Navegação principal">
+          <a href="/index.html" class="header__nav-link header__nav-link--active" aria-current="page"><i data-lucide="house"></i> Início</a>
+          <a href="/pages/pontos.html" class="header__nav-link"><i data-lucide="map-pin"></i> Pontos</a>
+          <a href="/pages/sobre.html" class="header__nav-link"><i data-lucide="info"></i> Sobre</a>
+          <a href="/pages/sugestao.html" class="header__nav-link header__nav-link--cta"><i data-lucide="plus"></i> Sugerir</a>
+        </nav>
+        <button class="header__tema" data-toggle-tema type="button" aria-label="Alternar tema" title="Alternar tema"></button>
+        <button class="header__menu-btn" type="button" onclick="toggleMenu(this)" aria-label="Abrir menu" aria-expanded="false" aria-controls="headerNav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <main id="conteudo">
+  <section class="hero">
+    <div class="wrap">
+      <span class="hero__badge"><i data-lucide="leaf"></i> Reciclagem no Distrito Federal</span>
+      <h1>Descarte certo,<br /><em>mais perto de você</em></h1>
+      <p class="lead">Encontre o ponto de coleta ideal para cada tipo de resíduo — eletrônicos, pilhas, óleo, vidro e muito mais.</p>
+
+      <form class="searchbar" id="formBuscaHero" autocomplete="off">
+        <i data-lucide="search"></i>
+        <input type="text" id="inputBuscaHero" placeholder="Buscar resíduo ou ponto…" aria-label="Buscar resíduo ou ponto de coleta" />
+        <button type="submit" class="btn btn--primary searchbar__btn" aria-label="Buscar">
+          <i data-lucide="search"></i><span class="searchbar__btn-texto">Buscar</span>
+        </button>
+      </form>
+
+      <div class="busca-atalhos" id="buscaAtalhos" aria-label="Buscas populares"></div>
+
+      <div class="hero__ctas">
+        <button class="btn btn--primary btn--lg" onclick="abrirMapa()"><i data-lucide="map"></i> Ver mapa</button>
+        <a class="btn btn--ghost btn--lg" href="pages/pontos.html"><i data-lucide="list"></i> Ver todos os pontos</a>
+        <a class="btn btn--ghost btn--lg" href="#como-funciona"><i data-lucide="help-circle"></i> Como funciona</a>
+      </div>
+
+      <div class="stats">
+        <span class="stat"><i data-lucide="map-pin"></i> <b id="statPontos">—</b> pontos de coleta</span>
+        <span class="stat"><i data-lucide="building-2"></i> <b id="statCidades">—</b> cidades</span>
+        <span class="stat"><i data-lucide="layers"></i> <b id="statResiduos">—</b> tipos de resíduo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CATEGORIAS ===================== -->
+  <section id="categorias">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="recycle"></i> O que descartar</span>
+        <h2>O que você pode descartar</h2>
+        <p>Toque em uma categoria para ver os pontos que recebem esse resíduo.</p>
+      </div>
+      <div class="cats" id="categoriasGrid">
+        <div class="skeleton-card" style="height: 118px;"></div>
+        <div class="skeleton-card" style="height: 118px;"></div>
+        <div class="skeleton-card" style="height: 118px;"></div>
+        <div class="skeleton-card" style="height: 118px;"></div>
+        <div class="skeleton-card" style="height: 118px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MAPA (PRÉ-CARREGADO + EXPANSÍVEL) ===================== -->
+  <section id="mapa-secao" class="section--alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="map"></i> Explore</span>
+        <h2>Veja tudo no mapa</h2>
+        <p>Filtre por resíduo, suba a lista e expanda o mapa em tela cheia.</p>
+      </div>
+
+      <div class="mapa-shell-holder">
+        <div class="mapa-shell" id="mapaShell">
+          <!-- Mapa Leaflet (pré-carregado) -->
+          <div id="mapa"></div>
+
+          <!-- Barra superior do mapa -->
+          <div class="mapa-chrome">
+            <label class="searchbar mapa-chrome__busca">
+              <i data-lucide="search"></i>
+              <input type="text" id="inputBuscaMapa" placeholder="Buscar ponto ou endereço..." autocomplete="off" aria-label="Buscar ponto ou endereço no mapa" />
+            </label>
+            <button class="icon-round" id="btnTogglePainel" onclick="togglePainel()" title="Mostrar/ocultar lista" aria-label="Mostrar ou ocultar a lista" aria-controls="mapaPainel">
+              <i data-lucide="panel-left"></i>
+            </button>
+            <button class="icon-round" id="btnExpandirMapa" onclick="toggleExpandirMapa()" title="Expandir mapa" aria-label="Expandir mapa" aria-controls="mapaShell" aria-expanded="false">
+              <i data-lucide="maximize-2"></i>
+            </button>
+          </div>
+
+          <!-- Painel de resultados (lista arrastável) -->
+          <aside class="mapa-painel" id="mapaPainel" data-estado="half" aria-label="Pontos de coleta encontrados">
+            <div class="mapa-painel__handle" id="mapaPainelHandle" aria-hidden="true"><span></span></div>
+            <div class="mapa-painel__head">
+              <div class="mapa-painel__head-top">
+                <div class="mapa-painel__head-info">
+                  <h3 id="mapaContador" role="status" aria-live="polite">Carregando...</h3>
+                  <p id="mapaSub">buscando pontos de coleta</p>
+                </div>
+                <div class="mapa-painel__head-acoes">
+                  <button class="mapa-painel__min chips__nav chips__nav--prev" type="button" onclick="rolarChips(-1)" title="Filtros anteriores" aria-label="Rolar filtros para a esquerda">
+                    <i data-lucide="chevron-left"></i>
+                  </button>
+                  <button class="mapa-painel__min chips__nav chips__nav--next" type="button" onclick="rolarChips(1)" title="Mais filtros" aria-label="Rolar filtros para a direita">
+                    <i data-lucide="chevron-right"></i>
+                  </button>
+                  <button class="mapa-painel__min" type="button" id="btnMinimizarLista" onclick="minimizarLista()" title="Minimizar lista" aria-label="Minimizar lista" aria-controls="mapaLista" aria-expanded="true">
+                    <i data-lucide="chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="chips" id="chipsWrap">
+                <div class="chip-row" id="chipsFiltro" role="group" aria-label="Filtrar pontos por tipo de resíduo" tabindex="0"></div>
+              </div>
+            </div>
+            <div class="mapa-painel__lista" id="mapaLista" tabindex="-1">
+              <div class="lista__skeleton">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Preview (somente mobile, quando não expandido) -->
+          <div class="mapa-preview" id="mapaPreview">
+            <span class="mapa-preview__hint"><i data-lucide="pointer"></i> Toque para explorar</span>
+            <div class="mapa-preview__cta">
+              <button class="btn btn--primary" onclick="abrirParaDetalhes()">
+                <i data-lucide="maximize-2"></i> Abrir para mais detalhes
+              </button>
+              <button class="btn btn--ghost" onclick="abrirComLista()">
+                <i data-lucide="list"></i> Ver lista (<span id="previewContador">0</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Botão para reabrir a lista minimizada -->
+          <button class="btn-ver-lista" id="btnVerLista" onclick="reabrirLista()" aria-controls="mapaPainel">
+            <i data-lucide="list"></i> Ver lista (<span id="btnVerListaContador">0</span>)
+          </button>
+
+          <!-- Botão de localização -->
+          <button class="btn-localizacao" onclick="centralizarNoUsuario()" title="Minha localização" aria-label="Minha localização">
+            <i data-lucide="locate-fixed"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PONTOS EM DESTAQUE ===================== -->
+  <section id="pontos">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="map-pin"></i> Perto de você</span>
+        <h2>Pontos em destaque</h2>
+      </div>
+      <div class="destaques" id="destaquesGrid">
+        <div class="skeleton-card" style="height: 120px;"></div>
+        <div class="skeleton-card" style="height: 120px;"></div>
+        <div class="skeleton-card" style="height: 120px;"></div>
+      </div>
+      <div class="center-cta">
+        <a class="btn btn--ghost btn--lg" href="pages/pontos.html"><i data-lucide="list"></i> Ver todos os pontos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMO FUNCIONA ===================== -->
+  <section id="como-funciona" class="section--alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="sparkles"></i> Simples assim</span>
+        <h2>Como funciona</h2>
+        <p>Três passos para dar o destino certo ao seu resíduo.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">1</div>
+          <h3>Procure</h3>
+          <p>Busque pelo resíduo ou pela sua região na barra de busca.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">2</div>
+          <h3>Escolha o ponto</h3>
+          <p>Veja os pontos mais próximos, com endereço e horários de funcionamento.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">3</div>
+          <h3>Faça o descarte</h3>
+          <p>Leve o material até o local indicado. Pronto, você reciclou!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- ===================== RODAPÉ (único do site) ===================== -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <i data-lucide="recycle"></i>
+        <span>DF Coleta &copy; 2026</span>
+      </div>
+
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="/index.html">Início</a>
+        <a href="/pages/pontos.html">Pontos</a>
+        <a href="/pages/sobre.html">Sobre</a>
+        <a href="/pages/sugestao.html">Sugerir Ponto</a>
+        <a href="/pages/admin/login.html" class="footer__lock" title="Área restrita" aria-label="Área restrita"><i data-lucide="lock"></i></a>
+      </nav>
+
+      <p class="footer__copy">Pela preservação e sustentabilidade do Distrito Federal.</p>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Scripts do app -->
+  <script src="js/api.js"></script>
+  <script src="js/mapa.js"></script>
+  <script src="js/index.js"></script>
+
+  <script>
+    /* Menu do celular (mesmo comportamento das páginas internas) */
+    function toggleMenu(btn) {
+      const nav = document.getElementById('headerNav');
+      if (!nav) return;
+      const aberto = nav.classList.toggle('is-open');
+      if (btn) btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
+    /* No celular, fecha o menu ao tocar num link (ex.: "Como funciona") */
+    document.querySelectorAll('#headerNav a').forEach((link) => {
+      link.addEventListener('click', () => {
+        const nav = document.getElementById('headerNav');
+        const btn = document.querySelector('.header__menu-btn');
+        if (nav) nav.classList.remove('is-open');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* Inicializa ícones Lucide */
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>

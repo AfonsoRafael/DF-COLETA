@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sugestões – Admin DF Coleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../../js/tema.js"></script>
+  <link rel="stylesheet" href="../../css/admin.css" />
+</head>
+<body>
+  <!-- Overlay Drawer Mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <!-- Toast -->
+  <div id="toastNotificacao" class="admin-toast" role="status" aria-live="polite">
+    <i id="toastIcone" data-lucide="check-circle-2"></i>
+    <span id="toastMensagem">Mensagem</span>
+  </div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon"><i data-lucide="recycle"></i></div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button class="admin-sidebar__close-btn" onclick="fecharSidebar()" aria-label="Fechar menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button class="admin-topbar__menu-btn admin-topbar__toggle" onclick="toggleSidebar()" aria-label="Abrir menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__titulo admin-topbar__title">Sugestões de Novos Pontos</h1>
+            <span class="admin-topbar__subtitle">Analise os locais sugeridos pela comunidade e cadastre os aprovados</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar__acoes admin-topbar__right">
+          <button class="admin-btn admin-btn--secundario" onclick="carregarSugestoes()" title="Atualizar dados">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Estatísticas -->
+        <div class="admin-stat-grid admin-stat-grid--4">
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Total de Sugestões</span>
+              <span class="admin-stat-card__value" id="statTotal">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+              <i data-lucide="lightbulb"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Aguardando Análise</span>
+              <span class="admin-stat-card__value" id="statPendentes">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--amarelo">
+              <i data-lucide="clock"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Aprovadas</span>
+              <span class="admin-stat-card__value" id="statAprovadas">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Rejeitadas</span>
+              <span class="admin-stat-card__value" id="statRejeitadas">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--vermelho">
+              <i data-lucide="x-circle"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Busca e filtros -->
+        <div class="filtros-card">
+          <div class="filtros-grid">
+            <div class="busca-wrapper">
+              <i data-lucide="search"></i>
+              <input
+                type="text"
+                id="inputBusca"
+                class="admin-input"
+                placeholder="Buscar por local, endereço ou autor..."
+                oninput="aoDigitarBusca()"
+              />
+              <button class="btn-limpar-busca" id="btnLimparBusca" onclick="limparBusca()" title="Limpar busca">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <select id="filtroStatus" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todos os Status</option>
+              <option value="pendente">Pendente</option>
+              <option value="aprovado">Aprovada</option>
+              <option value="rejeitado">Rejeitada</option>
+            </select>
+
+            <button class="admin-btn admin-btn--secundario" onclick="limparFiltros()" title="Limpar todos os filtros">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista -->
+        <div class="admin-card">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="list"></i>
+                <span>Sugestões Recebidas</span>
+              </h2>
+              <span class="admin-card__subtitle" id="labelContagemResultados">Carregando registros...</span>
+            </div>
+          </div>
+
+          <div class="admin-lista" id="listaSugestoes">
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 200px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 60%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 40%; margin-top: 8px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 170px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 55%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 35%; margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Aprovar e Cadastrar -->
+  <div class="admin-modal" id="modalAprovar">
+    <div class="admin-modal__box">
+      <div class="admin-modal__header">
+        <h3 class="admin-modal__title">Aprovar Sugestão</h3>
+        <button type="button" class="admin-modal__close" onclick="fecharModal()" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p class="admin-modal__sub">Revise os dados antes de cadastrar o novo ponto de coleta.</p>
+      <div class="admin-form-group">
+        <label class="admin-label" for="apNome">Nome do Ponto *</label>
+        <input class="admin-input" id="apNome" type="text" />
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label" for="apEndereco">Endereço *</label>
+        <input class="admin-input" id="apEndereco" type="text" />
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-label" for="apCidade">Cidade / Região *</label>
+        <input class="admin-input" id="apCidade" type="text" />
+      </div>
+      <div class="admin-form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label class="admin-label" for="apLatitude">Latitude (opcional)</label>
+          <input class="admin-input" id="apLatitude" type="number" step="any" placeholder="-15.7942" />
+        </div>
+        <div>
+          <label class="admin-label" for="apLongitude">Longitude (opcional)</label>
+          <input class="admin-input" id="apLongitude" type="number" step="any" placeholder="-47.8825" />
+        </div>
+      </div>
+      <p class="admin-modal__sub" style="margin-top: -4px;">Sem as coordenadas o ponto é cadastrado, mas não aparece no mapa.</p>
+      <div class="admin-form-group">
+        <label class="admin-label" for="apTelefone">Telefone (opcional)</label>
+        <input class="admin-input" id="apTelefone" type="text" placeholder="(61) 0000-0000" />
+      </div>
+      <div class="admin-modal__footer">
+        <button class="admin-btn admin-btn--secundario" onclick="fecharModal()">Cancelar</button>
+        <button class="admin-btn" onclick="confirmarAprovacao()">
+          <i data-lucide="check"></i> Cadastrar Ponto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rejeitar Sugestão -->
+  <div class="admin-modal" id="modalRejeitar">
+    <div class="admin-modal__box" style="max-width: 440px;">
+      <div class="admin-modal__header">
+        <h3 class="admin-modal__title">Rejeitar sugestão</h3>
+        <button type="button" class="admin-modal__close" onclick="fecharModalRejeitar()" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p class="admin-modal__sub" style="margin-top: 0;">
+        Você está prestes a rejeitar <strong id="rejeitarNome">esta sugestão</strong>.
+        O registro sai da fila de análise, mas pode ser reativado depois.
+      </p>
+      <div class="admin-modal__footer">
+        <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalRejeitar()">Cancelar</button>
+        <button type="button" class="admin-btn admin-btn--perigo" id="btnConfirmarRejeicao" onclick="confirmarRejeicao()">
+          <i data-lucide="x"></i> Rejeitar sugestão
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    verificarAuth();
+
+    let todasSugestoes = [];
+    let sugestaoAtual = null;
+
+    /* Espelho local do status vindo da API (persistido no Supabase). */
+    const estadoLocal = {};
+
+    const SITUACAO = {
+      pendente:  { classe: 'admin-badge--pendente', rotulo: 'Pendente' },
+      aprovado:  { classe: 'admin-badge--sucesso',  rotulo: 'Aprovada' },
+      rejeitado: { classe: 'admin-badge--perigo',   rotulo: 'Rejeitada' },
+    };
+
+    /** Escapa texto vindo da API antes de montar o HTML. */
+    function esc(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    function situacaoDe(id) {
+      return estadoLocal[id] || 'pendente';
+    }
+
+    /**
+     * Os resíduos chegam como array (mock novo) ou como texto separado por
+     * vírgulas (`residuos_sugeridos`, backend atual). Devolve sempre array.
+     */
+    function residuosDe(sugestao) {
+      const bruto = sugestao.residuos || sugestao.tiposResiduos || sugestao.residuos_sugeridos || [];
+      if (typeof bruto === 'string') {
+        return bruto.split(',').map((item) => item.trim()).filter(Boolean);
+      }
+      return Array.isArray(bruto) ? bruto : [];
+    }
+
+    function dataCurta(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const toast = document.getElementById('toastNotificacao');
+      const texto = document.getElementById('toastMensagem');
+      const icone = document.getElementById('toastIcone');
+
+      texto.textContent = mensagem;
+      toast.className = `admin-toast admin-toast--${tipo} visivel`;
+      icone.setAttribute('data-lucide', tipo === 'sucesso' ? 'check-circle-2' : 'alert-circle');
+      lucide.createIcons();
+
+      setTimeout(() => toast.classList.remove('visivel'), 3500);
+    }
+
+    async function carregarSugestoes() {
+      const container = document.getElementById('listaSugestoes');
+      try {
+        const dados = await requisicao('/sugestoes');
+        todasSugestoes = Array.isArray(dados) ? dados : [];
+
+        // Reflete o status persistido no banco
+        todasSugestoes.forEach((s) => {
+          if (s.status) estadoLocal[s.id] = String(s.status).toLowerCase();
+        });
+
+        aplicarFiltros();
+      } catch (erro) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon" style="background: var(--admin-danger-bg); color: var(--admin-danger-text);">
+              <i data-lucide="plug-zap"></i>
+            </div>
+            <div class="empty-state__title">Falha ao conectar com a API</div>
+            <div class="empty-state__desc">Verifique se o backend está no ar e tente novamente.</div>
+          </div>`;
+        document.getElementById('labelContagemResultados').textContent = 'Sem conexão com o servidor';
+        lucide.createIcons();
+      }
+    }
+
+    function atualizarEstatisticas() {
+      const conta = (situacao) => todasSugestoes.filter((s) => situacaoDe(s.id) === situacao).length;
+      document.getElementById('statTotal').textContent = todasSugestoes.length;
+      document.getElementById('statPendentes').textContent = conta('pendente');
+      document.getElementById('statAprovadas').textContent = conta('aprovado');
+      document.getElementById('statRejeitadas').textContent = conta('rejeitado');
+    }
+
+    function aplicarFiltros() {
+      const status = document.getElementById('filtroStatus').value;
+      const texto = document.getElementById('inputBusca').value.trim().toLowerCase();
+
+      const filtradas = todasSugestoes.filter((s) => {
+        const local = String(s.nomeLocal || s.nome_local || '').toLowerCase();
+        const endereco = String(s.endereco || '').toLowerCase();
+        const autor = String(s.nomeAutor || s.nome_autor || '').toLowerCase();
+        const okStatus = !status || situacaoDe(s.id) === status;
+        const okTexto = !texto || local.includes(texto) || endereco.includes(texto) || autor.includes(texto);
+        return okStatus && okTexto;
+      });
+
+      atualizarEstatisticas();
+      renderizar(filtradas);
+    }
+
+    function renderizar(lista) {
+      const container = document.getElementById('listaSugestoes');
+      const rotulo = document.getElementById('labelContagemResultados');
+
+      if (lista.length !== todasSugestoes.length) {
+        rotulo.textContent = `${lista.length} de ${todasSugestoes.length} registros`;
+      } else {
+        rotulo.textContent = `${lista.length} registro${lista.length === 1 ? '' : 's'} encontrado${lista.length === 1 ? '' : 's'}`;
+      }
+
+      if (!lista.length) {
+        const semDados = todasSugestoes.length === 0;
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i data-lucide="${semDados ? 'lightbulb' : 'search-x'}"></i>
+            </div>
+            <div class="empty-state__title">${semDados ? 'Nenhuma sugestão recebida' : 'Nenhum resultado encontrado'}</div>
+            <div class="empty-state__desc">
+              ${semDados
+                ? 'Quando alguém sugerir um novo ponto de coleta, ele aparece aqui para análise.'
+                : 'Ajuste a busca ou o filtro de status para ver outras sugestões.'}
+            </div>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = lista.map((s) => {
+        const situacao = situacaoDe(s.id);
+        const info = SITUACAO[situacao];
+        const autor = s.nomeAutor || s.nome_autor || 'Anônimo';
+        const email = s.emailAutor || s.email_autor || '';
+        const observacoes = s.textoSugestao || s.informacoesAdicionais || '';
+
+        const tags = residuosDe(s)
+          .slice(0, 6)
+          .map((r) => `<span class="admin-tag-pill">${esc(typeof r === 'string' ? r : r.nome)}</span>`)
+          .join('');
+
+        let acoes = '';
+        if (situacao === 'pendente') {
+          acoes = `
+            <button class="admin-btn admin-btn--sm" onclick="abrirModal(${s.id})">
+              <i data-lucide="check-circle-2"></i> Aprovar e Cadastrar
+            </button>
+            <button class="admin-btn admin-btn--sm admin-btn--perigo" onclick="abrirModalRejeitar(${s.id})">
+              <i data-lucide="x"></i> Rejeitar
+            </button>`;
+        } else if (situacao === 'rejeitado') {
+          acoes = `
+            <button class="admin-btn admin-btn--sm admin-btn--secundario" onclick="reativar(${s.id})">
+              <i data-lucide="rotate-ccw"></i> Reativar
+            </button>`;
+        }
+
+        return `
+          <article class="admin-item">
+            <div class="admin-item__topo">
+              <div>
+                <span class="admin-item__titulo">${esc(s.nomeLocal || s.nome_local || 'Local sem nome')}</span>
+                <span class="admin-item__id">#${esc(s.id)}</span>
+                <div class="admin-item__desc">
+                  ${esc(s.endereco || 'Endereço não informado')}${s.cidade ? ' · ' + esc(s.cidade) : ''}
+                </div>
+              </div>
+              <span class="admin-badge ${info.classe}">${info.rotulo}</span>
+            </div>
+
+            <div class="admin-item__meta">
+              <span><i data-lucide="user"></i> ${esc(autor)}</span>
+              <span><i data-lucide="calendar"></i> ${dataCurta(s.data)}</span>
+              ${email ? `<span><i data-lucide="mail"></i> ${esc(email)}</span>` : ''}
+            </div>
+
+            ${observacoes ? `<p class="admin-item__texto">${esc(observacoes)}</p>` : ''}
+            ${tags ? `<div class="admin-item__tags">${tags}</div>` : ''}
+            ${acoes ? `<div class="admin-item__acoes">${acoes}</div>` : ''}
+          </article>`;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    /* ---------- Modal de aprovação ---------- */
+
+    function abrirModal(id) {
+      sugestaoAtual = todasSugestoes.find((s) => s.id === id);
+      if (!sugestaoAtual) return;
+
+      document.getElementById('apNome').value = sugestaoAtual.nomeLocal || sugestaoAtual.nome_local || '';
+      document.getElementById('apEndereco').value = sugestaoAtual.endereco || '';
+      document.getElementById('apCidade').value = sugestaoAtual.cidade || '';
+      document.getElementById('apLatitude').value = '';
+      document.getElementById('apLongitude').value = '';
+      document.getElementById('apTelefone').value = '';
+
+      document.getElementById('modalAprovar').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModal() {
+      document.getElementById('modalAprovar').classList.remove('aberto');
+      sugestaoAtual = null;
+    }
+
+    async function confirmarAprovacao() {
+      if (!sugestaoAtual) return;
+
+      const nome = document.getElementById('apNome').value.trim();
+      const endereco = document.getElementById('apEndereco').value.trim();
+      const cidade = document.getElementById('apCidade').value.trim();
+      const telefone = document.getElementById('apTelefone').value.trim();
+      const latitudeTexto = document.getElementById('apLatitude').value.trim();
+      const longitudeTexto = document.getElementById('apLongitude').value.trim();
+      const latitude = latitudeTexto === '' ? null : Number(latitudeTexto);
+      const longitude = longitudeTexto === '' ? null : Number(longitudeTexto);
+
+      if (!nome || !endereco || !cidade) {
+        mostrarToast('Preencha nome, endereço e cidade para cadastrar.', 'erro');
+        return;
+      }
+
+      if ((latitudeTexto !== '' && !Number.isFinite(latitude)) ||
+          (longitudeTexto !== '' && !Number.isFinite(longitude))) {
+        mostrarToast('Latitude e longitude devem ser números válidos.', 'erro');
+        return;
+      }
+
+      try {
+        // Tenta reaproveitar os resíduos sugeridos pelo cidadão.
+        let residuos = [];
+        try {
+          const sugeridos = residuosDe(sugestaoAtual);
+          if (sugeridos.length > 0) {
+            const nomes = new Set(
+              sugeridos
+                .map((r) => String(typeof r === 'string' ? r : r.nome || '').trim().toLowerCase())
+                .filter(Boolean),
+            );
+            const lista = await requisicao('/residuos');
+            residuos = (Array.isArray(lista) ? lista : [])
+              .filter((r) => nomes.has(String(r.nome || '').trim().toLowerCase()))
+              .map((r) => ({ id: r.id, nome: r.nome }));
+          }
+        } catch {
+          residuos = []; // segue com o cadastro mesmo sem os resíduos
+        }
+
+        await requisicao('/pontos-coleta', {
+          method: 'POST',
+          body: JSON.stringify({
+            nome,
+            endereco,
+            cidade,
+            telefone: telefone || null,
+            tipo: 'ECOPONTO',
+            status: 'ATIVO',
+            latitude,
+            longitude,
+            residuos,
+          }),
+        });
+
+        await requisicao(`/sugestoes/${sugestaoAtual.id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'APROVADO' }),
+        });
+
+        estadoLocal[sugestaoAtual.id] = 'aprovado';
+        mostrarToast('Sugestão aprovada e ponto cadastrado.');
+      } catch (erro) {
+        mostrarToast(`Falha ao aprovar: ${erro.message}`, 'erro');
+      }
+
+      fecharModal();
+      aplicarFiltros();
+    }
+
+    /* ---------- Modal de rejeição ---------- */
+
+    let sugestaoRejeitar = null;
+
+    function abrirModalRejeitar(id) {
+      const sugestao = todasSugestoes.find((s) => s.id === id);
+      if (!sugestao) return;
+
+      sugestaoRejeitar = sugestao;
+      const nome = sugestao.nomeLocal || sugestao.nome_local || `Sugestão #${id}`;
+      document.getElementById('rejeitarNome').textContent = `"${nome}"`;
+      document.getElementById('btnConfirmarRejeicao').disabled = false;
+      document.getElementById('modalRejeitar').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalRejeitar() {
+      document.getElementById('modalRejeitar').classList.remove('aberto');
+      sugestaoRejeitar = null;
+    }
+
+    async function confirmarRejeicao() {
+      if (!sugestaoRejeitar) return;
+
+      const id = sugestaoRejeitar.id;
+      const btn = document.getElementById('btnConfirmarRejeicao');
+      btn.disabled = true;
+
+      try {
+        await requisicao(`/sugestoes/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'REJEITADO' }),
+        });
+        estadoLocal[id] = 'rejeitado';
+        fecharModalRejeitar();
+        aplicarFiltros();
+        mostrarToast(`Sugestão #${id} rejeitada.`);
+      } catch (erro) {
+        btn.disabled = false;
+        mostrarToast(`Falha ao rejeitar: ${erro.message}`, 'erro');
+      }
+    }
+
+    // Fecha a caixa de diálogo com Esc ou clique fora do painel
+    document.getElementById('modalRejeitar').addEventListener('click', (evento) => {
+      if (evento.target.id === 'modalRejeitar') fecharModalRejeitar();
+    });
+
+    document.addEventListener('keydown', (evento) => {
+      const modal = document.getElementById('modalRejeitar');
+      if (evento.key === 'Escape' && modal.classList.contains('aberto')) {
+        fecharModalRejeitar();
+      }
+    });
+
+    async function reativar(id) {
+      try {
+        await requisicao(`/sugestoes/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'PENDENTE' }),
+        });
+        delete estadoLocal[id];
+        aplicarFiltros();
+        mostrarToast(`Sugestão #${id} voltou para a análise.`);
+      } catch (erro) {
+        mostrarToast(`Falha ao reabrir: ${erro.message}`, 'erro');
+      }
+    }
+
+    /* ---------- Filtros ---------- */
+
+    function aoDigitarBusca() {
+      const valor = document.getElementById('inputBusca').value.trim();
+      document.getElementById('btnLimparBusca').style.display = valor ? 'block' : 'none';
+      aplicarFiltros();
+    }
+
+    function limparBusca() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      aplicarFiltros();
+    }
+
+    function limparFiltros() {
+      document.getElementById('filtroStatus').value = '';
+      limparBusca();
+    }
+
+    carregarSugestoes();
+  </script>
+</body>
+</html>

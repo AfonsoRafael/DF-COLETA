@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sugerir Ponto de Coleta – DF Coleta</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../js/tema.js"></script>
+
+  <!-- CSS do Design System -->
+  <link rel="stylesheet" href="../css/pages.css" />
+
+  <!-- Navegação única (cabeçalho + rodapé) -->
+  <link rel="stylesheet" href="../css/navegacao.css" />
+</head>
+<body>
+
+  <a href="#conteudo" class="pular-link">Pular para o conteúdo</a>
+
+  <!-- Cabeçalho Padrão -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="../index.html" class="header__brand">
+        <div class="header__brand-icon"><i data-lucide="recycle"></i></div>
+        <span class="header__brand-nome">DF Coleta</span>
+      </a>
+      <div class="header__direita">
+        <nav class="header__nav" id="headerNav" aria-label="Navegação principal">
+          <a href="/index.html" class="header__nav-link"><i data-lucide="house"></i> Início</a>
+          <a href="/pages/pontos.html" class="header__nav-link"><i data-lucide="map-pin"></i> Pontos</a>
+          <a href="/pages/sobre.html" class="header__nav-link"><i data-lucide="info"></i> Sobre</a>
+          <a href="/pages/sugestao.html" class="header__nav-link header__nav-link--cta header__nav-link--active" aria-current="page"><i data-lucide="plus"></i> Sugerir</a>
+        </nav>
+        <button class="header__tema" data-toggle-tema type="button" aria-label="Alternar tema" title="Alternar tema"></button>
+        <button class="header__menu-btn" type="button" onclick="toggleMenu(this)" aria-label="Abrir menu" aria-expanded="false" aria-controls="headerNav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="page-hero">
+    <div class="page-hero__badge">
+      <i data-lucide="plus-circle"></i>
+      <span>Colaboração Comunitária</span>
+    </div>
+    <h1 class="page-hero__title">Sugerir um Novo Ponto</h1>
+    <p class="page-hero__subtitle">
+      Conhece um ecoponto, cooperativa, farmácia ou comércio que recebe resíduos para descarte no DF? Compartilhe e ajude a comunidade!
+    </p>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <main class="page-content page-content--narrow" id="conteudo">
+
+    <!-- Container de Alertas -->
+    <div id="mensagemFeedback"></div>
+
+    <!-- Formulário Card -->
+    <div class="card">
+      <form id="formSugestao">
+
+        <!-- Informações do Ponto -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <i data-lucide="map-pin" style="color: var(--primary); width: 20px; height: 20px;"></i>
+            Dados do Local
+          </h2>
+
+          <div class="form-group">
+            <label class="form-label" for="nomeLocal">Nome do Local ou Estabelecimento <span class="req">*</span></label>
+            <input
+              type="text"
+              id="nomeLocal"
+              name="nomeLocal"
+              class="form-input"
+              required
+              placeholder="Ex: Ecoponto Samambaia Sul, Supermercado XYZ, Drogaria ABC..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="endereco">Endereço Completo <span class="req">*</span></label>
+            <input
+              type="text"
+              id="endereco"
+              name="endereco"
+              class="form-input"
+              required
+              placeholder="Ex: QN 312 Conjunto 5 Lote 1, Próximo à estação..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cidade">Região Administrativa / Cidade no DF <span class="req">*</span></label>
+            <select id="cidade" name="cidade" class="form-select" required>
+              <option value="" disabled selected>Selecione a região no DF</option>
+              <option value="Plano Piloto">Plano Piloto (Asa Norte / Asa Sul)</option>
+              <option value="Águas Claras">Águas Claras</option>
+              <option value="Arniqueira">Arniqueira</option>
+              <option value="Brazlândia">Brazlândia</option>
+              <option value="Candangolândia">Candangolândia</option>
+              <option value="Ceilândia">Ceilândia</option>
+              <option value="Cruzeiro">Cruzeiro</option>
+              <option value="Fercal">Fercal</option>
+              <option value="Gama">Gama</option>
+              <option value="Guará">Guará (I e II)</option>
+              <option value="Itapoã">Itapoã</option>
+              <option value="Jardim Botânico">Jardim Botânico</option>
+              <option value="Lago Norte">Lago Norte</option>
+              <option value="Lago Sul">Lago Sul</option>
+              <option value="Núcleo Bandeirante">Núcleo Bandeirante</option>
+              <option value="Paranoá">Paranoá</option>
+              <option value="Park Way">Park Way</option>
+              <option value="Planaltina">Planaltina</option>
+              <option value="Recanto das Emas">Recanto das Emas</option>
+              <option value="Riacho Fundo">Riacho Fundo (I e II)</option>
+              <option value="Samambaia">Samambaia</option>
+              <option value="Santa Maria">Santa Maria</option>
+              <option value="São Sebastião">São Sebastião</option>
+              <option value="SCIA / Estrutural">SCIA / Estrutural</option>
+              <option value="SIA">SIA</option>
+              <option value="Sobradinho">Sobradinho / Sobradinho II</option>
+              <option value="Sol Nascente / Pôr do Sol">Sol Nascente / Pôr do Sol</option>
+              <option value="Sudoeste / Octogonal">Sudoeste / Octogonal</option>
+              <option value="Taguatinga">Taguatinga</option>
+              <option value="Varjão">Varjão</option>
+              <option value="Vicente Pires">Vicente Pires</option>
+            </select>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-light); margin-bottom: 2rem;" />
+
+        <!-- Resíduos Aceitos -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <i data-lucide="recycle" style="color: var(--primary); width: 20px; height: 20px;"></i>
+            Tipos de Resíduos Aceitos
+          </h2>
+          <p class="form-hint" style="margin-bottom: 1rem;">Marque todos os materiais que este local recebe:</p>
+
+          <div class="residuo-grid">
+            <!-- Eletrônicos -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Eletrônicos" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="monitor"></i></div>
+              <span class="residuo-checkbox-name">Eletrônicos</span>
+            </label>
+
+            <!-- Pilhas e Baterias -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Pilhas e Baterias" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="battery"></i></div>
+              <span class="residuo-checkbox-name">Pilhas e Baterias</span>
+            </label>
+
+            <!-- Óleo de Cozinha -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Óleo de Cozinha" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="droplets"></i></div>
+              <span class="residuo-checkbox-name">Óleo de Cozinha</span>
+            </label>
+
+            <!-- Papel e Papelão -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Papel e Papelão" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="file-text"></i></div>
+              <span class="residuo-checkbox-name">Papel e Papelão</span>
+            </label>
+
+            <!-- Plástico -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Plástico" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="package"></i></div>
+              <span class="residuo-checkbox-name">Plástico</span>
+            </label>
+
+            <!-- Vidro -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Vidro" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="wine"></i></div>
+              <span class="residuo-checkbox-name">Vidro</span>
+            </label>
+
+            <!-- Metal -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Metal" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="cog"></i></div>
+              <span class="residuo-checkbox-name">Metal</span>
+            </label>
+
+            <!-- Medicamentos -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Medicamentos" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="pill"></i></div>
+              <span class="residuo-checkbox-name">Medicamentos</span>
+            </label>
+
+            <!-- Lâmpadas -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="Lâmpadas" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="lightbulb"></i></div>
+              <span class="residuo-checkbox-name">Lâmpadas</span>
+            </label>
+
+            <!-- TVs Analógicas -->
+            <label class="residuo-checkbox-label">
+              <input type="checkbox" name="residuos" value="TVs Analógicas" />
+              <span class="residuo-checkbox-custom"><i data-lucide="check"></i></span>
+              <div class="residuo-checkbox-icon"><i data-lucide="tv"></i></div>
+              <span class="residuo-checkbox-name">TVs Analógicas</span>
+            </label>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-light); margin-bottom: 2rem;" />
+
+        <!-- Dados do Solicitante -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <i data-lucide="user" style="color: var(--primary); width: 20px; height: 20px;"></i>
+            Seus Dados de Contato
+          </h2>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="nomeAutor">Seu Nome Completo <span class="req">*</span></label>
+              <input
+                type="text"
+                id="nomeAutor"
+                name="nomeAutor"
+                class="form-input"
+                required
+                placeholder="Ex: Maria Pereira"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="emailAutor">Seu E-mail <span class="req">*</span></label>
+              <input
+                type="email"
+                id="emailAutor"
+                name="emailAutor"
+                class="form-input"
+                required
+                placeholder="Ex: maria@exemplo.com"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.5rem;">
+            <label class="form-label" for="textoSugestao">Informações Adicionais ou Observações</label>
+            <textarea
+              id="textoSugestao"
+              name="textoSugestao"
+              class="form-textarea"
+              rows="4"
+              placeholder="Ex: Horários de atendimento, telefone do local, ponto de referência específico ou instruções para descarte..."
+            ></textarea>
+            <p class="form-hint">Quanto mais detalhes você fornecer, mais rápida será a conferência e publicação do ponto.</p>
+          </div>
+        </div>
+
+        <!-- Ação Submit -->
+        <button type="submit" id="btnSubmit" class="btn btn--primary btn--block btn--lg">
+          <i data-lucide="send"></i>
+          <span>Enviar Sugestão de Ponto</span>
+        </button>
+
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Rodapé Padrão -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <i data-lucide="recycle"></i>
+        <span>DF Coleta &copy; 2026</span>
+      </div>
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="/index.html">Início</a>
+        <a href="/pages/pontos.html">Pontos</a>
+        <a href="/pages/sobre.html">Sobre</a>
+        <a href="/pages/sugestao.html">Sugerir Ponto</a>
+        <a href="/pages/admin/login.html" class="footer__lock" title="Área restrita" aria-label="Área restrita"><i data-lucide="lock"></i></a>
+      </nav>
+      <p class="footer__copy">Pela preservação e sustentabilidade do Distrito Federal.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script>
+    function toggleMenu(btn) {
+      const nav = document.getElementById('headerNav');
+      if (!nav) return;
+      const aberto = nav.classList.toggle('is-open');
+      if (btn) btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
+    document.getElementById('formSugestao').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const btn = document.getElementById('btnSubmit');
+      const containerFeedback = document.getElementById('mensagemFeedback');
+
+      // Coleta dados
+      const nomeLocal = document.getElementById('nomeLocal').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+      const cidade = document.getElementById('cidade').value;
+      const nomeAutor = document.getElementById('nomeAutor').value.trim();
+      const emailAutor = document.getElementById('emailAutor').value.trim();
+      const textoSugestao = document.getElementById('textoSugestao').value.trim();
+
+      // Coleta resíduos selecionados
+      const checkboxes = form.querySelectorAll('input[name="residuos"]:checked');
+      const residuos = Array.from(checkboxes).map(cb => cb.value);
+
+      // Feedback de loading
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2"></i><span>Enviando sugestão...</span>';
+      lucide.createIcons();
+
+      // Monta texto estruturado
+      const detalhesResiduos = residuos.length > 0 ? `Resíduos: ${residuos.join(', ')}` : '';
+      const textoFinal = [detalhesResiduos, textoSugestao ? `Observações: ${textoSugestao}` : ''].filter(Boolean).join(' | ');
+
+      const dados = {
+        nome_local: nomeLocal,
+        nomeLocal: nomeLocal,
+        endereco: endereco,
+        cidade: cidade,
+        residuos: residuos,
+        texto_sugestao: textoFinal,
+        textoSugestao: textoFinal,
+        nome_autor: nomeAutor,
+        nomeAutor: nomeAutor,
+        email_autor: emailAutor,
+        emailAutor: emailAutor,
+        data: new Date().toISOString()
+      };
+
+      try {
+        await sugerirPonto(dados);
+
+        containerFeedback.innerHTML = `
+          <div class="alert alert--success alert-animated" role="alert">
+            <i data-lucide="check-circle-2"></i>
+            <div>
+              <strong>Sugestão enviada com sucesso!</strong>
+              <p>Muito obrigado pela sua colaboração! Nossa equipe irá validar as informações de <strong>${nomeLocal}</strong> e adicionar ao mapa em breve.</p>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+        form.reset();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      } catch (erro) {
+        containerFeedback.innerHTML = `
+          <div class="alert alert--error alert-animated" role="alert">
+            <i data-lucide="alert-circle"></i>
+            <div>
+              <strong>Não foi possível enviar a sugestão</strong>
+              <p>${erro.message || 'Verifique sua conexão ou tente novamente mais tarde.'}</p>
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="send"></i><span>Enviar Sugestão de Ponto</span>';
+        lucide.createIcons();
+      }
+    });
+
+    // Inicializa ícones Lucide
+    lucide.createIcons();
+  </script>
+</body>
+</html>

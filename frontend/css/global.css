@@ -1,0 +1,216 @@
+@import url('tokens.css');
+
+/* ====================
+   VARIÁVEIS GLOBAIS
+   (apontam para os tokens unificados em css/tokens.css)
+   ==================== */
+:root {
+  --cor-primaria: var(--df-primary);
+  --cor-primaria-claro: var(--df-primary-hover);
+  --cor-primaria-hover: var(--df-primary-active);
+  --cor-secundaria: var(--df-surface-2);
+  --cor-fundo: var(--df-bg);
+  --cor-texto: var(--df-text);
+  --cor-texto-suave: var(--df-text-soft);
+  --cor-borda: var(--df-border);
+  --cor-erro: var(--df-danger);
+  --cor-sucesso: var(--df-success);
+  --cor-aviso: var(--df-warn);
+
+  --fonte-principal: var(--df-font);
+  --borda-radius: var(--df-radius-sm);
+  --sombra: var(--df-shadow);
+  --transicao: var(--df-transition);
+}
+
+/* ====================
+   RESET E BASE
+   ==================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: var(--df-scrollbar-thumb) var(--df-scrollbar-track);
+  scrollbar-width: thin;
+}
+
+/* ====================
+   BARRA DE ROLAGEM (segue o tema claro/escuro)
+   ==================== */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--df-scrollbar-track);
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--df-scrollbar-thumb);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--df-scrollbar-thumb-hover);
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+body {
+  font-family: var(--fonte-principal);
+  font-size: 16px;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--cor-primaria);
+  text-decoration: none;
+  transition: color var(--transicao);
+}
+
+a:hover {
+  color: var(--cor-primaria-hover);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ====================
+   TIPOGRAFIA
+   ==================== */
+h1 { font-size: 2rem; font-weight: 700; }
+h2 { font-size: 1.5rem; font-weight: 600; }
+h3 { font-size: 1.2rem; font-weight: 600; }
+p  { margin-bottom: 0.5rem; }
+
+/* ====================
+   RESPONSIVIDADE
+   ==================== */
+@media (max-width: 768px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+}
+
+/* ====================
+   FOCO VISÍVEL (navegação por teclado)
+   ==================== */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--df-primary) !important;
+  outline-offset: 2px !important;
+}
+/* Dentro de superfícies escuras o anel branco ajuda */
+.leaflet-container :focus-visible { outline-color: var(--df-accent) !important; }
+
+/* ====================
+   MOVIMENTO REDUZIDO (prefers-reduced-motion)
+   ==================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ====================
+   MAPA (Leaflet) — integrado ao tema claro/escuro
+   ==================== */
+.leaflet-container {
+  background: var(--df-surface-2);
+  font-family: var(--df-font);
+  font-size: .8rem;
+  line-height: 1.45;
+}
+.leaflet-container a { color: var(--df-primary); }
+
+/* No tema escuro escurecemos os tiles por filtro (sem provedor extra/API key).
+   Só o pane de tiles é filtrado, então pinos e popups mantêm as cores reais. */
+[data-theme="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--df-surface);
+  color: var(--df-text);
+  box-shadow: var(--df-shadow);
+  border-radius: var(--df-radius-sm);
+}
+.leaflet-popup-content { margin: 13px 15px; }
+.leaflet-popup-close-button { color: var(--df-text-muted) !important; }
+.leaflet-popup-close-button:hover { color: var(--df-text) !important; }
+
+.leaflet-control-zoom {
+  border: 1px solid var(--df-border) !important;
+  border-radius: 11px !important;
+  overflow: hidden;
+  box-shadow: var(--df-shadow-sm);
+}
+.leaflet-control-zoom a,
+.leaflet-bar a {
+  background: var(--df-surface);
+  color: var(--df-text);
+  border-color: var(--df-border) !important;
+  width: 32px;
+  height: 32px;
+  line-height: 30px;
+  font-size: 1.15rem;
+}
+.leaflet-control-zoom a:hover,
+.leaflet-bar a:hover {
+  background: var(--df-surface-2);
+  color: var(--df-primary);
+}
+.leaflet-bar a:first-child { border-bottom-color: var(--df-border) !important; }
+
+.leaflet-control-attribution {
+  background: var(--df-glass) !important;
+  color: var(--df-text-muted) !important;
+  padding: 2px 7px;
+  border-radius: 8px 0 0 0;
+  font-size: .68rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.leaflet-control-attribution a { color: var(--df-text-soft) !important; }
+
+/* ---------- Marcadores ---------- */
+.df-marcador svg {
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .28));
+  transform-origin: 50% 100%;
+  transition: transform var(--df-transition);
+}
+.df-marcador:hover svg { transform: scale(1.1) translateY(-1px); }
+
+.df-voce { position: relative; width: 18px; height: 18px; }
+.df-voce__ponto {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--df-accent);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+}
+.df-voce__pulso {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: var(--df-accent-soft);
+  animation: dfPulso 2.2s ease-out infinite;
+}
+@keyframes dfPulso {
+  0%   { transform: scale(.55); opacity: .95; }
+  100% { transform: scale(1.7);  opacity: 0; }
+}

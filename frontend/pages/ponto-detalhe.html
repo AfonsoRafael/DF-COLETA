@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes do Ponto – DF Coleta</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../js/tema.js"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- CSS do Design System -->
+  <link rel="stylesheet" href="../css/pages.css" />
+
+  <!-- Navegação única (cabeçalho + rodapé) -->
+  <link rel="stylesheet" href="../css/navegacao.css" />
+</head>
+<body>
+
+  <a href="#conteudo" class="pular-link">Pular para o conteúdo</a>
+
+  <!-- Cabeçalho Padrão -->
+  <header class="header">
+    <div class="header__inner">
+      <a href="../index.html" class="header__brand">
+        <div class="header__brand-icon"><i data-lucide="recycle"></i></div>
+        <span class="header__brand-nome">DF Coleta</span>
+      </a>
+      <div class="header__direita">
+        <nav class="header__nav" id="headerNav" aria-label="Navegação principal">
+          <a href="/index.html" class="header__nav-link"><i data-lucide="house"></i> Início</a>
+          <a href="/pages/pontos.html" class="header__nav-link header__nav-link--active" aria-current="page"><i data-lucide="map-pin"></i> Pontos</a>
+          <a href="/pages/sobre.html" class="header__nav-link"><i data-lucide="info"></i> Sobre</a>
+          <a href="/pages/sugestao.html" class="header__nav-link header__nav-link--cta"><i data-lucide="plus"></i> Sugerir</a>
+        </nav>
+        <button class="header__tema" data-toggle-tema type="button" aria-label="Alternar tema" title="Alternar tema"></button>
+        <button class="header__menu-btn" type="button" onclick="toggleMenu(this)" aria-label="Abrir menu" aria-expanded="false" aria-controls="headerNav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="page-content" id="conteudo">
+
+    <!-- Breadcrumb Dinâmico -->
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+      <a href="../index.html"><i data-lucide="home" style="width:14px; height:14px;"></i> Início</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="pontos.html">Pontos de Coleta</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current" id="breadcrumbNomePonto">Carregando ponto...</span>
+    </nav>
+
+    <!-- Container do Detalhe -->
+    <div id="containerDetalhe">
+      <div style="text-align: center; padding: 4rem 1rem;">
+        <i data-lucide="loader-2" class="animate-spin" style="width: 36px; height: 36px; color: var(--primary); margin: 0 auto 1rem;"></i>
+        <p style="color: var(--text-secondary); font-size: 1.05rem;">Carregando detalhes do ponto de coleta...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Rodapé Padrão -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <i data-lucide="recycle"></i>
+        <span>DF Coleta &copy; 2026</span>
+      </div>
+      <nav class="footer__links" aria-label="Links do rodapé">
+        <a href="/index.html">Início</a>
+        <a href="/pages/pontos.html">Pontos</a>
+        <a href="/pages/sobre.html">Sobre</a>
+        <a href="/pages/sugestao.html">Sugerir Ponto</a>
+        <a href="/pages/admin/login.html" class="footer__lock" title="Área restrita" aria-label="Área restrita"><i data-lucide="lock"></i></a>
+      </nav>
+      <p class="footer__copy">Pela preservação e sustentabilidade do Distrito Federal.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/mapa.js"></script>
+  <script>
+    function toggleMenu(btn) {
+      const nav = document.getElementById('headerNav');
+      if (!nav) return;
+      const aberto = nav.classList.toggle('is-open');
+      if (btn) btn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    }
+
+    // Mapa de ícones Lucide para tipos de resíduos
+    const ICONES_RESIDUOS = {
+      'Eletrônicos': 'monitor',
+      'Pilhas e Baterias': 'battery',
+      'Óleo de Cozinha': 'droplets',
+      'Papel e Papelão': 'file-text',
+      'Plástico': 'package',
+      'Vidro': 'wine',
+      'Metal': 'cog',
+      'Medicamentos': 'pill',
+      'Lâmpadas': 'lightbulb',
+      'TVs Analógicas': 'tv',
+    };
+
+    /** Escapa texto vindo da API antes de entrar no HTML. */
+    function escaparHtml(valor) {
+      return String(valor == null ? '' : valor).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    let pontoAtual = null;
+    let localizacaoUsuario = null;
+
+    // Inicialização da página
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      obterGeolocalizacao();
+
+      const params = new URLSearchParams(window.location.search);
+      const pontoId = params.get('id');
+
+      if (!pontoId) {
+        exibirErro('ID do ponto de coleta não fornecido na URL.');
+        return;
+      }
+
+      try {
+        const ponto = await buscarPontoPorId(pontoId);
+        pontoAtual = ponto;
+        renderizarPaginaPonto(ponto);
+        carregarComentarios(ponto.id);
+      } catch (erro) {
+        exibirErro(`Erro ao carregar informações do ponto: ${erro.message}`);
+      }
+    });
+
+    function obterGeolocalizacao() {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            localizacaoUsuario = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            };
+            atualizarBadgeDistancia();
+          },
+          (err) => {
+            console.log('Geolocalização não autorizada ou indisponível:', err.message);
+          },
+          { timeout: 5000, maximumAge: 60000 }
+        );
+      }
+    }
+
+    function atualizarBadgeDistancia() {
+      if (!localizacaoUsuario || !pontoAtual || !pontoAtual.latitude || !pontoAtual.longitude) return;
+      const elDistancia = document.getElementById('badgeDistancia');
+      if (elDistancia && typeof calcularDistancia === 'function') {
+        const dist = calcularDistancia(
+          localizacaoUsuario.lat,
+          localizacaoUsuario.lng,
+          pontoAtual.latitude,
+          pontoAtual.longitude
+        );
+        elDistancia.innerHTML = `<i data-lucide="navigation"></i> ${dist.toFixed(1)} km de você`;
+        elDistancia.style.display = 'inline-flex';
+        lucide.createIcons();
+      }
+    }
+
+    function exibirErro(msg) {
+      document.getElementById('breadcrumbNomePonto').textContent = 'Erro';
+      document.getElementById('containerDetalhe').innerHTML = `
+        <div class="card" style="text-align: center; padding: 3rem 1.5rem; max-width: 600px; margin: 2rem auto;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+            <i data-lucide="alert-triangle" style="width: 28px; height: 28px;"></i>
+          </div>
+          <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">Ponto não encontrado</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">${msg}</p>
+          <a href="pontos.html" class="btn btn--primary">
+            <i data-lucide="arrow-left"></i>
+            Voltar para a Lista de Pontos
+          </a>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderizarPaginaPonto(ponto) {
+      // Atualiza título da página e breadcrumb
+      document.title = `${ponto.nome} – DF Coleta`;
+      document.getElementById('breadcrumbNomePonto').textContent = ponto.nome;
+
+      // Status
+      const statusAtivo = (ponto.status || 'ATIVO').toUpperCase() === 'ATIVO';
+      const badgeStatus = statusAtivo
+        ? `<span class="badge badge--ativo"><i data-lucide="check-circle-2"></i> Ponto Ativo</span>`
+        : `<span class="badge badge--inativo"><i data-lucide="x-circle"></i> Ponto Desativado</span>`;
+
+      // Tipo de estabelecimento
+      const ROTULOS_TIPO = {
+        ECOPONTO: 'Ecoponto',
+        COOPERATIVA: 'Cooperativa',
+        FARMACIA: 'Farmácia',
+        COMERCIO: 'Comércio',
+        COMUNITARIO: 'Ponto Comunitário',
+        ESCOLA: 'Escola',
+      };
+      const tipo = String(ponto.tipo || 'ECOPONTO').toUpperCase();
+      const rotuloTipo = ROTULOS_TIPO[tipo] || 'Ecoponto';
+      const badgeTipo = `<span class="badge" style="background: var(--bg-page); color: var(--text-secondary); border: 1px solid var(--border-light);"><i data-lucide="building-2"></i> ${rotuloTipo}</span>`;
+      const ehEstabelecimento = ['FARMACIA', 'COMERCIO', 'COOPERATIVA', 'ESCOLA'].includes(tipo);
+
+      // Resíduos aceitos
+      const residuos = ponto.residuos || [];
+      const residuosHtml = residuos.length > 0
+        ? residuos.map(r => {
+            const iconName = ICONES_RESIDUOS[r.nome] || 'recycle';
+            return `
+              <span class="badge-residuo">
+                <i data-lucide="${iconName}"></i>
+                ${escaparHtml(r.nome)}
+              </span>
+            `;
+          }).join('')
+        : `<p style="color: var(--text-secondary); font-style: italic;">Nenhum tipo de resíduo especificado.</p>`;
+
+      // Horários
+      const horarios = ponto.horarios_funcionamento || ponto.horariosFuncionamento || [];
+      const horariosHtml = horarios.length > 0
+        ? `
+          <table class="horario-table">
+            <tbody>
+              ${horarios.map(h => `
+                <tr>
+                  <td class="dia">${escaparHtml(h.dia_semana || h.diaSemana || 'Dia regular')}</td>
+                  <td class="hora">${escaparHtml(h.hora_abertura || h.horaAbertura || '08:00')} às ${escaparHtml(h.hora_fechamento || h.horaFechamento || '18:00')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `
+        : `
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); padding: 0.5rem 0;">
+            <i data-lucide="clock" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+            <span>${ehEstabelecimento ? 'Horários não informados pelo estabelecimento.' : 'Funcionamento 24 horas ou sob consulta no local.'}</span>
+          </div>
+        `;
+
+      // Aviso de estabelecimento (requisito: horários para pontos em estabelecimentos)
+      const avisoEstabelecimento = ehEstabelecimento
+        ? `<p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.75rem;">
+             <i data-lucide="store" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+             Ponto localizado em estabelecimento comercial/parceiro — confira os horários antes de ir.
+           </p>`
+        : '';
+
+      // Contato
+      const telefoneHtml = ponto.telefone
+        ? `
+          <div class="contato-row" style="margin-bottom: 0.75rem;">
+            <i data-lucide="phone"></i>
+            <div>
+              <span style="font-size: 0.8125rem; color: var(--text-secondary); display: block;">Telefone para Contato</span>
+              <strong><a href="tel:${ponto.telefone.replace(/\D/g, '')}" style="color: var(--text-main); font-size: 1.05rem;">${escaparHtml(ponto.telefone)}</a></strong>
+            </div>
+          </div>
+        `
+        : `
+          <div class="contato-row" style="color: var(--text-secondary);">
+            <i data-lucide="phone-off" style="color: var(--text-muted);"></i>
+            <span>Telefone não informado para este local</span>
+          </div>
+        `;
+
+      // Link Google Maps (usa coordenadas ou, na falta delas, o endereço)
+      const temCoordenadas = ponto.latitude != null && ponto.longitude != null &&
+        ponto.latitude !== '' && ponto.longitude !== '';
+      const destinoMaps = temCoordenadas
+        ? `${ponto.latitude},${ponto.longitude}`
+        : `${ponto.endereco || ''}${ponto.cidade ? ', ' + ponto.cidade : ''}, DF`;
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinoMaps)}`;
+
+      // Monta HTML completo
+      const container = document.getElementById('containerDetalhe');
+      container.innerHTML = `
+        <!-- Hero do Ponto -->
+        <div class="ponto-hero-card">
+          <div class="ponto-hero__header">
+            <div>
+              <h1 class="ponto-hero__title">${escaparHtml(ponto.nome)}</h1>
+              <p class="ponto-hero__address">
+                <i data-lucide="map-pin"></i>
+                <span>${escaparHtml(ponto.endereco)}${ponto.cidade ? `, ${escaparHtml(ponto.cidade)} – DF` : ''}</span>
+              </p>
+            </div>
+            <div class="ponto-badges-wrap">
+              ${badgeStatus}
+              ${badgeTipo}
+              <span id="badgeDistancia" class="badge badge--distancia" style="display: none;"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Principal (2 colunas) -->
+        <div class="layout-sidebar-main">
+
+          <!-- Coluna Esquerda: Informações detalhadas -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Card Resíduos Aceitos -->
+            <div class="card">
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i data-lucide="recycle" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                Resíduos Aceitos
+              </h2>
+              <div class="residuos-tag-list">
+                ${residuosHtml}
+              </div>
+            </div>
+
+            <!-- Card Horários -->
+            <div class="card">
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i data-lucide="clock" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                Horários de Funcionamento
+              </h2>
+              ${horariosHtml}
+              ${avisoEstabelecimento}
+            </div>
+
+            <!-- Card Contato -->
+            <div class="card">
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i data-lucide="info" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                Informações de Contato
+              </h2>
+              ${telefoneHtml}
+            </div>
+
+          </div>
+
+          <!-- Coluna Direita: Mini Mapa + Rota + Comentários -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Card Localização e Mapa -->
+            <div class="card">
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <i data-lucide="map" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                Localização no Mapa
+              </h2>
+
+              <div id="miniMapa" class="mini-mapa-container"></div>
+
+              <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--block">
+                <i data-lucide="navigation"></i>
+                Como Chegar (Google Maps)
+              </a>
+            </div>
+
+            <!-- Card Reportar Problema -->
+            <div class="card">
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <i data-lucide="alert-triangle" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                Encontrou um problema?
+              </h2>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Informe dados incorretos, local fechado ou estrutura danificada. Nossa equipe vai analisar o relato.
+              </p>
+
+              <button type="button" id="btnAbrirProblema" class="btn btn--outline-green btn--block" onclick="alternarFormProblema()">
+                <i data-lucide="flag"></i>
+                <span>Reportar problema</span>
+              </button>
+
+              <div id="formProblemaWrap" hidden style="margin-top: 1rem; border-top: 1px solid var(--border-light); padding-top: 1rem;">
+                <div id="msgFeedbackProblema"></div>
+
+                <form id="formProblema">
+                  <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label class="form-label" for="nomeProblema" style="font-size: 0.8125rem;">Seu Nome <span class="req">*</span></label>
+                    <input type="text" id="nomeProblema" class="form-input" required placeholder="Ex: Lucas Ribeiro" style="padding: 0.6rem 0.85rem;" />
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label class="form-label" for="emailProblema" style="font-size: 0.8125rem;">Seu E-mail <span class="req">*</span></label>
+                    <input type="email" id="emailProblema" class="form-input" required placeholder="Ex: lucas@exemplo.com" style="padding: 0.6rem 0.85rem;" />
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label class="form-label" for="tipoProblema" style="font-size: 0.8125rem;">Qual o problema? <span class="req">*</span></label>
+                    <select id="tipoProblema" class="form-select" required style="padding: 0.6rem 0.85rem;">
+                      <option value="Informação incorreta">Informação incorreta</option>
+                      <option value="Local fechado ou inexistente">Local fechado ou inexistente</option>
+                      <option value="Estrutura danificada">Estrutura danificada</option>
+                      <option value="Resíduo não aceito">Resíduo não aceito no local</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <label class="form-label" for="gravidadeProblema" style="font-size: 0.8125rem;">Gravidade</label>
+                    <select id="gravidadeProblema" class="form-select" style="padding: 0.6rem 0.85rem;">
+                      <option value="BAIXA">Baixa</option>
+                      <option value="MEDIA" selected>Média</option>
+                      <option value="ALTA">Alta</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" for="descricaoProblema" style="font-size: 0.8125rem;">Descrição <span class="req">*</span></label>
+                    <textarea id="descricaoProblema" class="form-textarea" required rows="3" placeholder="Descreva o que está errado neste ponto..." style="padding: 0.6rem 0.85rem; min-height: 80px;"></textarea>
+                  </div>
+
+                  <button type="submit" id="btnEnviarProblema" class="btn btn--primary btn--block">
+                    <i data-lucide="send"></i>
+                    <span>Enviar Relato</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Card Comentários em largura total -->
+        <div class="card card-comentarios">
+          <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <i data-lucide="message-square" style="color: var(--primary); width: 20px; height: 20px;"></i>
+            Comentários e Experiências
+          </h2>
+
+          <div class="comentarios-layout">
+            <!-- Lista de Comentários -->
+            <div id="listaComentarios">
+              <p style="color: var(--text-secondary); font-size: 0.9rem; font-style: italic;">Carregando comentários...</p>
+            </div>
+
+            <!-- Formulário para Novo Comentário -->
+            <div class="comentarios-form">
+              <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-main);">Deixar um comentário</h3>
+
+              <div id="msgFeedbackComentario"></div>
+
+              <form id="formComentario">
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                  <label class="form-label" for="nomeComentario" style="font-size: 0.8125rem;">Seu Nome <span class="req">*</span></label>
+                  <input type="text" id="nomeComentario" class="form-input" required placeholder="Ex: Lucas Ribeiro" style="padding: 0.6rem 0.85rem;" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                  <label class="form-label" for="emailComentario" style="font-size: 0.8125rem;">Seu E-mail <span class="req">*</span></label>
+                  <input type="email" id="emailComentario" class="form-input" required placeholder="Ex: lucas@exemplo.com" style="padding: 0.6rem 0.85rem;" />
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label class="form-label" for="textoComentario" style="font-size: 0.8125rem;">Sua Mensagem <span class="req">*</span></label>
+                  <textarea id="textoComentario" class="form-textarea" required rows="3" placeholder="Conte como foi sua experiência de descarte neste ponto..." style="padding: 0.6rem 0.85rem; min-height: 80px;"></textarea>
+                </div>
+
+                <button type="submit" id="btnEnviarComentario" class="btn btn--primary btn--block">
+                  <i data-lucide="send"></i>
+                  <span>Publicar Comentário</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
+
+      // Inicializa o Mini Mapa Leaflet
+      setTimeout(() => {
+        inicializarMiniMapa(ponto);
+      }, 50);
+
+      // Listener para o formulário de comentário
+      configurarFormularioComentario(ponto.id);
+
+      // Listener para o formulário de relato de problema
+      configurarFormularioProblema(ponto.id);
+
+      // Atualiza badge de distância caso a localização já tenha sido obtida
+      atualizarBadgeDistancia();
+    }
+
+    function inicializarMiniMapa(ponto) {
+      if (!ponto.latitude || !ponto.longitude) {
+        const miniMapaEl = document.getElementById('miniMapa');
+        if (miniMapaEl) {
+          miniMapaEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;font-size:0.9rem;">Coordenadas não disponíveis</div>';
+        }
+        return;
+      }
+
+      const map = L.map('miniMapa', {
+        center: [ponto.latitude, ponto.longitude],
+        zoom: 15,
+        zoomControl: true,
+        attributionControl: false
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+      }).addTo(map);
+
+      // Marcador em forma de pino com o símbolo de reciclagem
+      const iconePonto = L.divIcon({
+        className: 'df-marcador-ponto',
+        html: `
+          <svg width="36" height="46" viewBox="0 0 36 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M18 1C8.611 1 1 8.611 1 18c0 11.2 13.2 24.1 15.4 26.2a2 2 0 0 0 2.8 0C21.4 42.1 35 29.2 35 18 35 8.611 27.389 1 18 1Z"
+                  fill="var(--df-primary, #0f8a4d)" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="18" cy="17.5" r="10" fill="#ffffff"/>
+            <g transform="translate(11 10.5) scale(0.5833)"
+               fill="none" stroke="var(--df-primary, #0f8a4d)" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 19H4.815a1.83 1.83 0 0 1-1.57-.881 1.785 1.785 0 0 1-.004-1.784L7.196 9.5"/>
+              <path d="M11 19h8.203a1.83 1.83 0 0 0 1.556-.89 1.784 1.784 0 0 0 0-1.775l-1.226-2.12"/>
+              <path d="m14 16-3 3 3 3"/>
+              <path d="M8.293 13.596 7.196 9.5 3.1 10.598"/>
+              <path d="m9.344 5.811 1.093-1.892A1.83 1.83 0 0 1 11.985 3a1.784 1.784 0 0 1 1.546.888l3.943 6.843"/>
+              <path d="m13.378 9.633 4.096 1.098 1.097-4.096"/>
+            </g>
+          </svg>
+        `,
+        iconSize: [36, 46],
+        iconAnchor: [18, 46],
+        popupAnchor: [0, -48]
+      });
+
+      L.marker([ponto.latitude, ponto.longitude], { icon: iconePonto }).addTo(map);
+    }
+
+    async function carregarComentarios(pontoId) {
+      const container = document.getElementById('listaComentarios');
+      if (!container) return;
+
+      try {
+        const comentarios = await buscarComentariosPorPonto(pontoId);
+        renderizarComentarios(comentarios);
+      } catch (err) {
+        console.warn('Erro ao carregar comentários da API:', err);
+        container.innerHTML = `
+          <p style="color: var(--text-muted); font-size: 0.875rem; font-style: italic;">
+            Nenhum comentário registrado ainda. Compartilhe o primeiro!
+          </p>
+        `;
+      }
+    }
+
+    // ===== Comentários: curtidas, respostas e cartões =====
+    const CHAVE_CURTIDOS = 'df-comentarios-curtidos';
+    const CHAVE_AUTOR = 'df-comentario-autor';
+
+    function lerAutorSalvo() {
+      try {
+        return JSON.parse(localStorage.getItem(CHAVE_AUTOR) || 'null') || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function salvarAutor(nome, email) {
+      try {
+        localStorage.setItem(CHAVE_AUTOR, JSON.stringify({ nome, email }));
+      } catch {
+        /* localStorage indisponível */
+      }
+    }
+
+    function lerCurtidos() {
+      try {
+        const lista = JSON.parse(localStorage.getItem(CHAVE_CURTIDOS) || '[]');
+        return new Set(Array.isArray(lista) ? lista.map(Number) : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function gravarCurtidos(curtidos) {
+      try {
+        localStorage.setItem(CHAVE_CURTIDOS, JSON.stringify([...curtidos]));
+      } catch {
+        /* localStorage indisponível */
+      }
+    }
+
+    function formatarDataComentario(iso) {
+      if (!iso) return 'Recentemente';
+      const data = new Date(iso);
+      if (Number.isNaN(data.getTime())) return 'Recentemente';
+      return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function htmlComentario(c, ehResposta) {
+      const id = Number(c.id);
+      const nome = c.nome_autor || c.nomeAutor || 'Cidadão';
+      const texto = c.texto_comentario || c.textoComentario || '';
+      const curtidas = Number(c.curtidas || 0);
+      const curtido = lerCurtidos().has(id);
+      const inicial = (nome.trim().charAt(0) || '?').toUpperCase();
+      const oficial = c.oficial === true;
+
+      return `
+        <article class="comentario-card${ehResposta ? ' comentario-card--resposta' : ''}${oficial ? ' comentario-card--oficial' : ''}" data-comentario="${id}">
+          <header class="comentario-card__topo">
+            <div class="comentario-autor">
+              <div class="comentario-avatar${oficial ? ' comentario-avatar--oficial' : ''}" aria-hidden="true">${escaparHtml(inicial)}</div>
+              <div class="comentario-autor__info">
+                <div class="comentario-nome-linha">
+                  <span class="comentario-name">${escaparHtml(nome)}</span>
+                  ${oficial ? `
+                    <span class="selo-oficial" title="Resposta oficial da equipe DF Coleta">
+                      <i data-lucide="badge-check"></i>
+                      <span>Verificado</span>
+                    </span>
+                  ` : ''}
+                </div>
+                <span class="comentario-date">
+                  <i data-lucide="calendar"></i>
+                  ${escaparHtml(formatarDataComentario(c.data))}
+                </span>
+              </div>
+            </div>
+            ${oficial
+              ? '<span class="comentario-selo comentario-selo--oficial"><i data-lucide="shield-check"></i> Equipe oficial</span>'
+              : (ehResposta ? '<span class="comentario-selo"><i data-lucide="reply"></i> Resposta</span>' : '')}
+          </header>
+
+          <p class="comentario-text">${escaparHtml(texto)}</p>
+
+          <footer class="comentario-acoes">
+            <button
+              type="button"
+              class="comentario-acao${curtido ? ' is-curtido' : ''}"
+              data-curtir="${id}"
+              aria-pressed="${curtido}"
+              aria-label="${curtido ? 'Remover curtida' : 'Curtir comentário'}"
+              onclick="alternarCurtida(${id}, this)"
+            >
+              <i data-lucide="heart"></i>
+              <span class="comentario-acao__contagem">${curtidas}</span>
+              <span class="comentario-acao__rotulo">${curtido ? 'Curtido' : 'Curtir'}</span>
+            </button>
+
+            ${ehResposta ? '' : `
+              <button
+                type="button"
+                class="comentario-acao"
+                aria-expanded="false"
+                aria-controls="respostaForm-${id}"
+                onclick="alternarFormResposta(${id})"
+              >
+                <i data-lucide="reply"></i>
+                <span>Responder</span>
+              </button>
+            `}
+          </footer>
+
+          ${ehResposta ? '' : `
+            <div class="comentario-resposta" id="respostaForm-${id}" hidden>
+              <form onsubmit="enviarResposta(event, ${id})">
+                <div class="comentario-resposta__linha">
+                  <input class="form-input" name="nome" type="text" required placeholder="Seu nome" aria-label="Seu nome" />
+                  <input class="form-input" name="email" type="email" required placeholder="Seu e-mail" aria-label="Seu e-mail" />
+                </div>
+                <textarea class="form-textarea" name="texto" rows="2" required placeholder="Escreva sua resposta..." aria-label="Sua resposta"></textarea>
+                <div class="comentario-resposta__acoes">
+                  <button type="button" class="btn btn--secondary btn--compacto" onclick="fecharFormResposta(${id})">Cancelar</button>
+                  <button type="submit" class="btn btn--primary btn--compacto">
+                    <i data-lucide="send"></i><span>Responder</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          `}
+        </article>
+      `;
+    }
+
+    function renderizarComentarios(lista) {
+      const container = document.getElementById('listaComentarios');
+      if (!container) return;
+
+      const comentarios = (Array.isArray(lista) ? lista : (lista?.value || [])).map((c) => ({
+        ...c,
+        id: Number(c.id),
+        curtidas: Number(c.curtidas || 0),
+        resposta_a: c.resposta_a == null ? null : Number(c.resposta_a),
+        oficial: c.oficial === true,
+      }));
+
+      if (comentarios.length === 0) {
+        container.innerHTML = `
+          <p style="color: var(--text-secondary); font-size: 0.875rem; font-style: italic; padding: 0.5rem 0;">
+            Ainda não há comentários sobre este ponto. Seja o primeiro a relatar sua experiência!
+          </p>
+        `;
+        return;
+      }
+
+      const porId = new Map(comentarios.map((c) => [c.id, c]));
+      const respostas = new Map();
+      const raizes = [];
+
+      comentarios.forEach((c) => {
+        if (c.resposta_a && porId.has(c.resposta_a)) {
+          if (!respostas.has(c.resposta_a)) respostas.set(c.resposta_a, []);
+          respostas.get(c.resposta_a).push(c);
+        } else {
+          raizes.push(c);
+        }
+      });
+
+      raizes.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+      respostas.forEach((filhas) => {
+        filhas.sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+      });
+
+      container.innerHTML = raizes.map((c) => {
+        const filhas = respostas.get(c.id) || [];
+        const blocoRespostas = filhas.length
+          ? `<div class="comentario-respostas">${filhas.map((f) => htmlComentario(f, true)).join('')}</div>`
+          : '';
+        return `${htmlComentario(c, false)}${blocoRespostas}`;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function alternarCurtida(id, botao) {
+      if (!botao || botao.disabled) return;
+
+      const curtidos = lerCurtidos();
+      const jaCurtido = curtidos.has(Number(id));
+      botao.disabled = true;
+
+      try {
+        const atualizado = await curtirComentario(id, !jaCurtido);
+
+        if (jaCurtido) curtidos.delete(Number(id));
+        else curtidos.add(Number(id));
+        gravarCurtidos(curtidos);
+
+        const contagem = botao.querySelector('.comentario-acao__contagem');
+        const rotulo = botao.querySelector('.comentario-acao__rotulo');
+        const total = Number(atualizado?.curtidas);
+
+        if (contagem) {
+          contagem.textContent = String(Number.isFinite(total)
+            ? total
+            : Math.max(0, Number(contagem.textContent || 0) + (jaCurtido ? -1 : 1)));
+        }
+        if (rotulo) rotulo.textContent = jaCurtido ? 'Curtir' : 'Curtido';
+
+        botao.classList.toggle('is-curtido', !jaCurtido);
+        botao.setAttribute('aria-pressed', String(!jaCurtido));
+        botao.setAttribute('aria-label', jaCurtido ? 'Curtir comentário' : 'Remover curtida');
+      } catch (erro) {
+        console.warn('Não foi possível registrar a curtida:', erro);
+      } finally {
+        botao.disabled = false;
+      }
+    }
+
+    function alternarFormResposta(id) {
+      const wrap = document.getElementById(`respostaForm-${id}`);
+      if (!wrap) return;
+
+      const abrir = wrap.hidden;
+      wrap.hidden = !abrir;
+
+      const botao = document.querySelector(`[aria-controls="respostaForm-${id}"]`);
+      if (botao) botao.setAttribute('aria-expanded', String(abrir));
+
+      if (abrir) {
+        const autor = lerAutorSalvo();
+        if (autor) {
+          wrap.elements.nome.value = autor.nome || '';
+          wrap.elements.email.value = autor.email || '';
+        }
+        const texto = wrap.elements.texto;
+        if (texto && window.matchMedia('(min-width: 769px)').matches) texto.focus();
+      }
+    }
+
+    function fecharFormResposta(id) {
+      const wrap = document.getElementById(`respostaForm-${id}`);
+      if (!wrap) return;
+
+      wrap.hidden = true;
+      wrap.reset();
+      const botao = document.querySelector(`[aria-controls="respostaForm-${id}"]`);
+      if (botao) botao.setAttribute('aria-expanded', 'false');
+    }
+
+    async function enviarResposta(event, paiId) {
+      event.preventDefault();
+      if (!pontoAtual) return;
+
+      const form = event.target;
+      const botao = form.querySelector('button[type="submit"]');
+      const nome = form.elements.nome.value.trim();
+      const email = form.elements.email.value.trim();
+      const texto = form.elements.texto.value.trim();
+      const conteudoOriginal = botao.innerHTML;
+
+      botao.disabled = true;
+      botao.innerHTML = '<i data-lucide="loader-2"></i><span>Enviando...</span>';
+      lucide.createIcons();
+
+      try {
+        await enviarComentario({
+          ponto_coleta_id: Number(pontoAtual.id),
+          nome_autor: nome,
+          email_autor: email,
+          texto_comentario: texto,
+          resposta_a: Number(paiId),
+        });
+
+        salvarAutor(nome, email);
+        await carregarComentarios(pontoAtual.id);
+      } catch (erro) {
+        console.warn('Erro ao publicar resposta:', erro);
+        botao.disabled = false;
+        botao.innerHTML = conteudoOriginal;
+        lucide.createIcons();
+      }
+    }
+
+    function configurarFormularioComentario(pontoId) {
+      const form = document.getElementById('formComentario');
+      if (!form) return;
+
+      // Reaproveita nome/e-mail já informados neste navegador
+      const autor = lerAutorSalvo();
+      if (autor) {
+        const campoNome = document.getElementById('nomeComentario');
+        const campoEmail = document.getElementById('emailComentario');
+        if (campoNome && !campoNome.value) campoNome.value = autor.nome || '';
+        if (campoEmail && !campoEmail.value) campoEmail.value = autor.email || '';
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnEnviarComentario');
+        const feedback = document.getElementById('msgFeedbackComentario');
+
+        const nome = document.getElementById('nomeComentario').value.trim();
+        const email = document.getElementById('emailComentario').value.trim();
+        const texto = document.getElementById('textoComentario').value.trim();
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2"></i><span>Enviando...</span>';
+        lucide.createIcons();
+
+        try {
+          await enviarComentario({
+            ponto_coleta_id: Number(pontoId),
+            pontoColetaId: Number(pontoId),
+            nome_autor: nome,
+            nomeAutor: nome,
+            email_autor: email,
+            emailAutor: email,
+            texto_comentario: texto,
+            textoComentario: texto,
+            data: new Date().toISOString()
+          });
+
+          feedback.innerHTML = `
+            <div class="alert alert--success alert-animated" style="padding: 0.65rem 0.85rem; font-size: 0.85rem; margin-bottom: 0.85rem;">
+              <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
+              <span>Comentário publicado com sucesso!</span>
+            </div>
+          `;
+          lucide.createIcons();
+          form.reset();
+          salvarAutor(nome, email);
+
+          // Recarrega lista de comentários
+          await carregarComentarios(pontoId);
+        } catch (erro) {
+          feedback.innerHTML = `
+            <div class="alert alert--error alert-animated" style="padding: 0.65rem 0.85rem; font-size: 0.85rem; margin-bottom: 0.85rem;">
+              <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+              <span>Erro ao publicar: ${erro.message}</span>
+            </div>
+          `;
+          lucide.createIcons();
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="send"></i><span>Publicar Comentário</span>';
+          lucide.createIcons();
+        }
+      });
+    }
+
+    // ===== Reportar problema =====
+    function alternarFormProblema() {
+      const wrap = document.getElementById('formProblemaWrap');
+      const botao = document.getElementById('btnAbrirProblema');
+      if (!wrap) return;
+
+      wrap.hidden = !wrap.hidden;
+
+      if (botao) {
+        botao.innerHTML = wrap.hidden
+          ? '<i data-lucide="flag"></i><span>Reportar problema</span>'
+          : '<i data-lucide="x"></i><span>Cancelar relato</span>';
+      }
+      lucide.createIcons();
+    }
+
+    function configurarFormularioProblema(pontoId) {
+      const form = document.getElementById('formProblema');
+      if (!form) return;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('btnEnviarProblema');
+        const feedback = document.getElementById('msgFeedbackProblema');
+
+        const nome = document.getElementById('nomeProblema').value.trim();
+        const email = document.getElementById('emailProblema').value.trim();
+        const tipo = document.getElementById('tipoProblema').value;
+        const gravidade = document.getElementById('gravidadeProblema').value;
+        const descricao = document.getElementById('descricaoProblema').value.trim();
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2"></i><span>Enviando...</span>';
+        lucide.createIcons();
+
+        try {
+          await relatarProblema({
+            ponto_coleta_id: Number(pontoId),
+            nome_autor: nome,
+            email_autor: email,
+            tipo_problema: tipo,
+            severidade: gravidade,
+            texto_problema: descricao,
+          });
+
+          feedback.innerHTML = `
+            <div class="alert alert--success alert-animated" style="padding: 0.65rem 0.85rem; font-size: 0.85rem; margin-bottom: 0.85rem;">
+              <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
+              <span>Relato enviado! Nossa equipe vai analisar.</span>
+            </div>
+          `;
+          lucide.createIcons();
+          form.reset();
+        } catch (erro) {
+          feedback.innerHTML = `
+            <div class="alert alert--error alert-animated" style="padding: 0.65rem 0.85rem; font-size: 0.85rem; margin-bottom: 0.85rem;">
+              <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+              <span>Erro ao enviar o relato: ${erro.message}</span>
+            </div>
+          `;
+          lucide.createIcons();
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="send"></i><span>Enviar Relato</span>';
+          lucide.createIcons();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

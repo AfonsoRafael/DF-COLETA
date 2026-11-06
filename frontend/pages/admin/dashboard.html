@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Administrativo – DF Coleta</title>
+
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS do Painel Administrativo -->
+  <link rel="stylesheet" href="../../css/admin.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../../js/tema.js"></script>
+</head>
+<body>
+
+  <!-- Overlay para fechar sidebar no mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <div class="admin-layout">
+
+    <!-- ====================================================================
+         SIDEBAR FIXA ESQUERDA (240px, Light, Borda direita)
+         ==================================================================== -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon">
+            <i data-lucide="recycle" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button
+          class="admin-sidebar__close-btn"
+          onclick="fecharSidebar()"
+          title="Fechar menu"
+          aria-label="Fechar menu lateral"
+        >
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         ÁREA PRINCIPAL
+         ==================================================================== -->
+    <div class="admin-main">
+
+      <!-- Topbar com Cabeçalho e Perfil -->
+      <header class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button
+            class="admin-topbar__toggle"
+            onclick="toggleSidebar()"
+            title="Abrir menu lateral"
+            aria-label="Abrir menu lateral"
+          >
+            <i data-lucide="menu" style="width: 20px; height: 20px;"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__title">Dashboard</h1>
+            <p class="admin-topbar__subtitle" id="topbarSubtitle">Visão geral do sistema de coleta do Distrito Federal</p>
+          </div>
+        </div>
+
+        <div class="admin-topbar__right">
+          <div class="admin-topbar__user">
+            <div class="admin-topbar__avatar" id="avatarIniciais">AD</div>
+            <div class="admin-topbar__user-info">
+              <span class="admin-topbar__user-name">Administrador</span>
+              <span class="admin-topbar__user-role" id="adminEmail">admin@dfcoleta.gov.br</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onclick="logout()"
+            class="admin-btn admin-btn--secundario admin-btn--sm"
+            title="Sair do painel"
+          >
+            <i data-lucide="log-out" style="width: 15px; height: 15px;"></i>
+            <span>Sair</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Conteúdo com Scroll -->
+      <main class="admin-content">
+
+        <!-- Mensagem de alerta/erro global de API (se offline) -->
+        <div id="alertaApi" style="display: none; margin-bottom: 20px; padding: 12px 16px; border-radius: 12px; background-color: var(--df-warn-soft); border: 1px solid var(--df-warn-border); color: var(--df-warn); font-size: 0.86rem; align-items: center; gap: 10px;">
+          <i data-lucide="alert-circle" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+          <span id="alertaApiTexto">Aviso: não foi possível conectar ao servidor backend. Mostrando dados em cache/demonstração.</span>
+        </div>
+
+        <!-- ==========================================
+             1. GRID DE MÉTRICAS PRINCIPAIS (4 CARDS)
+             ========================================== -->
+        <section aria-labelledby="tituloMetricasPrincipais">
+          <h2 id="tituloMetricasPrincipais" style="font-size: 0.86rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--admin-text-muted); margin-bottom: 12px;">
+            Métricas Principais
+          </h2>
+
+          <div class="admin-stat-grid admin-stat-grid--4">
+            
+            <!-- Card 1: Total de Pontos -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Total de Pontos</span>
+                <span class="admin-stat-card__value" id="statTotalPontos">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta">
+                  <i data-lucide="map-pin" style="width: 13px; height: 13px; color: #166534;"></i>
+                  <span>Mapeados no DF</span>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+                <i data-lucide="map-pin"></i>
+              </div>
+            </div>
+
+            <!-- Card 2: Pontos Ativos -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Pontos Ativos</span>
+                <span class="admin-stat-card__value" id="statPontosAtivos">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta">
+                  <span id="statPontosAtivosSub" class="admin-badge admin-badge--sucesso" style="padding: 1px 6px; font-size: 0.68rem;">
+                    calculando...
+                  </span>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--esmeralda">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+            </div>
+
+            <!-- Card 3: Resíduos Cadastrados -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Resíduos Cadastrados</span>
+                <span class="admin-stat-card__value" id="statTotalResiduos">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta">
+                  <i data-lucide="recycle" style="width: 13px; height: 13px; color: #1e40af;"></i>
+                  <span>Categorias ativas</span>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+                <i data-lucide="recycle"></i>
+              </div>
+            </div>
+
+            <!-- Card 4: Comentários -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Comentários</span>
+                <span class="admin-stat-card__value" id="statTotalComentarios">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta">
+                  <i data-lucide="message-square" style="width: 13px; height: 13px; color: #6b21a8;"></i>
+                  <span>Avaliações cidadãs</span>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--roxo">
+                <i data-lucide="message-square"></i>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================
+             2. SEGUNDO GRID DE MÉTRICAS (2 CARDS)
+             ========================================== -->
+        <section aria-labelledby="tituloDemandas" style="margin-top: 4px;">
+          <h2 id="tituloDemandas" style="font-size: 0.86rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--admin-text-muted); margin-bottom: 12px;">
+            Demandas da Comunidade
+          </h2>
+
+          <div class="admin-stat-grid admin-stat-grid--2">
+            
+            <!-- Card Demandas 1: Problemas Reportados -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Problemas Reportados</span>
+                <span class="admin-stat-card__value" id="statTotalProblemas">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta" style="margin-top: 10px;">
+                  <a href="problemas.html" class="admin-btn admin-btn--secundario admin-btn--sm">
+                    <span>Gerenciar problemas</span>
+                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--vermelho">
+                <i data-lucide="alert-triangle"></i>
+              </div>
+            </div>
+
+            <!-- Card Demandas 2: Sugestões Recebidas -->
+            <div class="admin-stat-card">
+              <div class="admin-stat-card__info">
+                <span class="admin-stat-card__label">Sugestões Recebidas</span>
+                <span class="admin-stat-card__value" id="statTotalSugestoes">
+                  <span class="admin-skeleton admin-skeleton-title" style="width: 60px; height: 32px;"></span>
+                </span>
+                <div class="admin-stat-card__meta" style="margin-top: 10px;">
+                  <a href="sugestoes.html" class="admin-btn admin-btn--secundario admin-btn--sm">
+                    <span>Avaliar sugestões</span>
+                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="admin-stat-card__icon admin-stat-card__icon--amarelo">
+                <i data-lucide="lightbulb"></i>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================
+             3. TABELA: ÚLTIMOS PONTOS DE COLETA (5 RECENTES)
+             ========================================== -->
+        <section class="admin-card" style="margin-top: 8px;">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="map-pin" style="color: #166534; width: 20px; height: 20px;"></i>
+                Últimos Pontos de Coleta
+              </h2>
+              <span class="admin-card__subtitle">Os 5 pontos cadastrados mais recentes no sistema</span>
+            </div>
+            <div class="admin-card__actions">
+              <a href="pontos.html" class="admin-btn admin-btn--secundario admin-btn--sm">
+                <span>Ver todos os pontos</span>
+                <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nome do Ponto</th>
+                  <th>Cidade / Região</th>
+                  <th>Status</th>
+                  <th>Resíduos Aceitos</th>
+                  <th style="text-align: right;">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaPontosCorpo">
+                <!-- Skeleton rows iniciais -->
+                <tr>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 160px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 100px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 70px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 140px;"></div></td>
+                  <td style="text-align: right;"><div class="admin-skeleton admin-skeleton-text" style="width: 50px; margin-left: auto;"></div></td>
+                </tr>
+                <tr>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 180px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 110px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 70px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 130px;"></div></td>
+                  <td style="text-align: right;"><div class="admin-skeleton admin-skeleton-text" style="width: 50px; margin-left: auto;"></div></td>
+                </tr>
+                <tr>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 150px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 90px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 70px;"></div></td>
+                  <td><div class="admin-skeleton admin-skeleton-text" style="width: 150px;"></div></td>
+                  <td style="text-align: right;"><div class="admin-skeleton admin-skeleton-text" style="width: 50px; margin-left: auto;"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             4. LISTA: COMENTÁRIOS RECENTES (3 RECENTES)
+             ========================================== -->
+        <section class="admin-card">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="message-square" style="color: #166534; width: 20px; height: 20px;"></i>
+                Comentários Recentes
+              </h2>
+              <span class="admin-card__subtitle">Últimas avaliações e observações compartilhadas pela comunidade</span>
+            </div>
+            <div class="admin-card__actions">
+              <a href="comentarios.html" class="admin-btn admin-btn--secundario admin-btn--sm">
+                <span>Ver todos os comentários</span>
+                <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+              </a>
+            </div>
+          </div>
+
+          <div id="listaComentarios" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Skeletons iniciais para comentários -->
+            <div style="border: 1px solid var(--admin-card-border); border-radius: 12px; padding: 16px; background-color: var(--admin-neutral-bg);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div class="admin-skeleton admin-skeleton-text" style="width: 120px;"></div>
+                <div class="admin-skeleton admin-skeleton-text" style="width: 80px;"></div>
+              </div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 85%;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 60%;"></div>
+            </div>
+            <div style="border: 1px solid var(--admin-card-border); border-radius: 12px; padding: 16px; background-color: var(--admin-neutral-bg);">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <div class="admin-skeleton admin-skeleton-text" style="width: 130px;"></div>
+                <div class="admin-skeleton admin-skeleton-text" style="width: 90px;"></div>
+              </div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 75%;"></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    // ==========================================
+    // GUARDA DE AUTENTICAÇÃO
+    // ==========================================
+    verificarAuth();
+
+    // Inicializa ícones Lucide no primeiro carregamento
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    // Configuração de perfil
+    const emailArmazenado = sessionStorage.getItem('df_admin_email') || 'admin@dfcoleta.com';
+    const elementoEmail = document.getElementById('adminEmail');
+    if (elementoEmail) elementoEmail.textContent = emailArmazenado;
+
+    const iniciais = emailArmazenado.substring(0, 2).toUpperCase();
+    const elementoAvatar = document.getElementById('avatarIniciais');
+    if (elementoAvatar) elementoAvatar.textContent = iniciais;
+
+    const API_URL = DF_API_BASE;
+
+    /**
+     * Formata datas ISO para padrão legível em português
+     */
+    function formatarData(dataIso) {
+      if (!dataIso) return 'Recente';
+      try {
+        const d = new Date(dataIso);
+        if (isNaN(d.getTime())) return 'Recente';
+        return d.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+      } catch {
+        return 'Recente';
+      }
+    }
+
+    /**
+     * Sanitiza strings para evitar injeção em innerHTML
+     */
+    function escaparHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Carrega todos os dados administrativos do Dashboard
+     */
+    async function carregarDashboard() {
+      try {
+        // Chamadas simultâneas às APIs especificadas
+        const [resPontos, resResiduos, resComentarios, resProblemas, resSugestoes] = await Promise.allSettled([
+          fetch(`${API_URL}/pontos-coleta?todos=true`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/residuos`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/comentarios`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/problemas`).then(r => r.ok ? r.json() : []),
+          fetch(`${API_URL}/sugestoes`).then(r => r.ok ? r.json() : []),
+        ]);
+
+        const pontos = resPontos.status === 'fulfilled' && Array.isArray(resPontos.value) ? resPontos.value : [];
+        const residuos = resResiduos.status === 'fulfilled' && Array.isArray(resResiduos.value) ? resResiduos.value : [];
+        const comentarios = resComentarios.status === 'fulfilled' && Array.isArray(resComentarios.value) ? resComentarios.value : [];
+        const problemas = resProblemas.status === 'fulfilled' && Array.isArray(resProblemas.value) ? resProblemas.value : [];
+        const sugestoes = resSugestoes.status === 'fulfilled' && Array.isArray(resSugestoes.value) ? resSugestoes.value : [];
+
+        // Exibe alerta caso todas as chamadas tenham falhado (ex: backend offline)
+        const algumaFalha = [resPontos, resResiduos, resComentarios, resProblemas, resSugestoes].some(r => r.status === 'rejected');
+        if (algumaFalha && pontos.length === 0) {
+          const alerta = document.getElementById('alertaApi');
+          if (alerta) alerta.style.display = 'flex';
+        }
+
+        // ==========================================
+        // 1. ATUALIZA MÉTRICAS PRINCIPAIS
+        // ==========================================
+        const totalPontos = pontos.length;
+        const pontosAtivos = pontos.filter(p => p.status === 'ATIVO').length;
+        const pctAtivos = totalPontos > 0 ? Math.round((pontosAtivos / totalPontos) * 100) : 0;
+
+        document.getElementById('statTotalPontos').textContent = totalPontos.toLocaleString('pt-BR');
+        document.getElementById('statPontosAtivos').textContent = pontosAtivos.toLocaleString('pt-BR');
+        document.getElementById('statPontosAtivosSub').textContent = `${pctAtivos}% operacionais`;
+
+        document.getElementById('statTotalResiduos').textContent = residuos.length.toLocaleString('pt-BR');
+        document.getElementById('statTotalComentarios').textContent = comentarios.length.toLocaleString('pt-BR');
+
+        // ==========================================
+        // 2. ATUALIZA MÉTRICAS SECUNDÁRIAS
+        // ==========================================
+        document.getElementById('statTotalProblemas').textContent = problemas.length.toLocaleString('pt-BR');
+        document.getElementById('statTotalSugestoes').textContent = sugestoes.length.toLocaleString('pt-BR');
+
+        // ==========================================
+        // 3. TABELA: ÚLTIMOS PONTOS (5 MAIS RECENTES)
+        // ==========================================
+        const tbodyPontos = document.getElementById('tabelaPontosCorpo');
+        if (pontos.length === 0) {
+          tbodyPontos.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 28px; color: var(--admin-text-muted); font-style: italic;">
+                Nenhum ponto de coleta cadastrado no momento.
+              </td>
+            </tr>
+          `;
+        } else {
+          // Ordena pelos mais recentes (maior ID caso não haja timestamp explícito) e pega 5
+          const ultimosPontos = [...pontos]
+            .sort((a, b) => (b.id || 0) - (a.id || 0))
+            .slice(0, 5);
+
+          tbodyPontos.innerHTML = ultimosPontos.map(p => {
+            const isAtivo = p.status === 'ATIVO';
+            const badgeClass = isAtivo ? 'admin-badge--sucesso' : 'admin-badge--inativo';
+
+            // Pílulas de resíduos aceitos (limita a 3 visíveis com contador extra)
+            const listaResiduos = Array.isArray(p.residuos) ? p.residuos : [];
+            let residuosHtml = '–';
+            if (listaResiduos.length > 0) {
+              const visiveis = listaResiduos.slice(0, 3).map(r => 
+                `<span class="admin-tag-pill">${escaparHtml(r.nome)}</span>`
+              ).join(' ');
+              const extras = listaResiduos.length > 3 ? `<span class="admin-tag-pill" style="font-weight:700;">+${listaResiduos.length - 3}</span>` : '';
+              residuosHtml = `<div style="display: flex; flex-wrap: wrap; gap: 4px;">${visiveis} ${extras}</div>`;
+            }
+
+            return `
+              <tr>
+                <td>
+                  <div style="font-weight: 600; color: var(--admin-text);">${escaparHtml(p.nome)}</div>
+                  <div style="font-size: 0.78rem; color: var(--admin-text-muted);">${escaparHtml(p.endereco || 'Endereço não informado')}</div>
+                </td>
+                <td>
+                  <span style="font-weight: 500;">${escaparHtml(p.cidade || 'Distrito Federal')}</span>
+                </td>
+                <td>
+                  <span class="admin-badge ${badgeClass}">${escaparHtml(p.status || 'ATIVO')}</span>
+                </td>
+                <td>
+                  ${residuosHtml}
+                </td>
+                <td style="text-align: right;">
+                  <a href="pontos.html" class="admin-btn admin-btn--secundario admin-btn--sm" title="Gerenciar ponto">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+                    <span>Gerenciar</span>
+                  </a>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // ==========================================
+        // 4. LISTA: COMENTÁRIOS RECENTES (3 MAIS RECENTES)
+        // ==========================================
+        const containerComentarios = document.getElementById('listaComentarios');
+        if (comentarios.length === 0) {
+          containerComentarios.innerHTML = `
+            <div style="text-align: center; padding: 32px 16px; color: var(--admin-text-muted); font-style: italic; background-color: var(--admin-neutral-bg); border-radius: 12px; border: 1px dashed var(--admin-card-border);">
+              <i data-lucide="message-square" style="width: 28px; height: 28px; margin-bottom: 8px; color: var(--admin-text-light); display: inline-block;"></i>
+              <p style="margin: 0;">Nenhum comentário enviado pela comunidade até o momento.</p>
+            </div>
+          `;
+        } else {
+          // Ordena pelos mais recentes e extrai 3
+          const ultimosComentarios = [...comentarios]
+            .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0) || (b.id || 0) - (a.id || 0))
+            .slice(0, 3);
+
+          containerComentarios.innerHTML = ultimosComentarios.map(c => {
+            const dataFmt = formatarData(c.data);
+            const autor = c.nome_autor || 'Cidadão anônimo';
+            const inicial = autor.charAt(0).toUpperCase() || 'C';
+            const pontoId = c.ponto_coleta_id ? `#${c.ponto_coleta_id}` : '';
+
+            return `
+              <div style="background-color: var(--admin-card-bg); border: 1px solid var(--admin-card-border); border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 9999px; background-color: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">
+                      ${inicial}
+                    </div>
+                    <div>
+                      <div style="font-size: 0.88rem; font-weight: 600; color: var(--admin-text);">${escaparHtml(autor)}</div>
+                      <div style="font-size: 0.74rem; color: var(--admin-text-muted);">${escaparHtml(c.email_autor || 'Email não fornecido')}</div>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    ${pontoId ? `<span class="admin-badge admin-badge--cinza" style="font-size: 0.7rem;">Ponto ${pontoId}</span>` : ''}
+                    <span style="font-size: 0.76rem; color: var(--admin-text-muted);">${dataFmt}</span>
+                  </div>
+                </div>
+
+                <p style="font-size: 0.88rem; color: var(--admin-text-muted); margin: 0; line-height: 1.5; background-color: var(--admin-neutral-bg); padding: 10px 12px; border-radius: 8px;">
+                  "${escaparHtml(c.texto_comentario || '')}"
+                </p>
+              </div>
+            `;
+          }).join('');
+        }
+
+      } catch (erroGeral) {
+        console.error('Falha ao processar dados do dashboard:', erroGeral);
+        const alerta = document.getElementById('alertaApi');
+        if (alerta) {
+          alerta.style.display = 'flex';
+          document.getElementById('alertaApiTexto').textContent = 'Erro ao se comunicar com os serviços backend. Verifique se a API está online em ' + DF_API_BASE + '.';
+        }
+      } finally {
+        // Re-executa Lucide para renderizar os ícones dinâmicos injetados
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      }
+    }
+
+    // Carrega o dashboard na inicialização da página
+    carregarDashboard();
+  </script>
+</body>
+</html>

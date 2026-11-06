@@ -1,0 +1,309 @@
+/* ============================================================
+   DF COLETA — DESIGN TOKENS  (Fase 1 do redesign)
+   ------------------------------------------------------------
+   Fonte única de verdade para cores, tipografia, formas e sombras.
+   Suporta tema claro (padrão) e escuro via atributo [data-theme] no <html>.
+
+   Uso: os CSS antigos (global.css, pages.css, admin.css, index.css)
+   apenas apontam suas variáveis para estes tokens (--df-*).
+   ============================================================ */
+
+:root,
+[data-theme="light"] {
+
+  /* ---------- Esquema nativo (controles/scrollbar do navegador) ---------- */
+  color-scheme: light;
+
+  /* ---------- Barra de rolagem (segue o tema do site) ---------- */
+  --df-scrollbar-thumb:       #c2d4cb;
+  --df-scrollbar-thumb-hover: #a4bcb0;
+  --df-scrollbar-track:       transparent;
+
+  /* ---------- Marca: verde moderno ---------- */
+  --df-primary:        #0f8a4d;
+  --df-primary-hover:  #0c7040;
+  --df-primary-active: #0a5c35;
+  --df-primary-soft:   #dcf3e5;
+  --df-primary-soft-2: #eaf8f0;
+  --df-primary-border: #b8e4c9;
+
+  /* ---------- Acento novo: azul ---------- */
+  --df-accent:         #0ea5e9;
+  --df-accent-hover:   #0284c7;
+  --df-accent-soft:    #e0f2fe;
+  --df-accent-border:  #bae6fd;
+
+  /* ---------- Texto ---------- */
+  --df-text:           #0f2419;
+  --df-text-soft:      #4b6157;
+  --df-text-muted:     #7c9086;
+
+  /* ---------- Superfícies e bordas ---------- */
+  --df-bg:             #f4f7f5;
+  --df-surface:        #ffffff;
+  --df-surface-2:      #eef3f0;
+  --df-border:         #e3ebe7;
+  --df-border-strong:  #cbd9d2;
+
+  /* ---------- Estados ---------- */
+  --df-success:        #0f8a4d;
+  --df-success-soft:   #dcf3e5;
+  --df-success-border: #b8e4c9;
+  --df-warn:           #b45309;
+  --df-warn-soft:      #fef3c7;
+  --df-warn-border:    #fde68a;
+  --df-danger:         #dc2626;
+  --df-danger-soft:    #fee2e2;
+  --df-danger-border:  #fecaca;
+  --df-info:           #0369a1;
+  --df-info-soft:      #e0f2fe;
+  --df-info-border:    #bae6fd;
+
+  /* ---------- Tipografia ---------- */
+  --df-font:           'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --df-font-display:   'Plus Jakarta Sans', var(--df-font);
+
+  /* ---------- Formas ---------- */
+  --df-radius-sm:      10px;
+  --df-radius:         16px;
+  --df-radius-lg:      22px;
+  --df-radius-pill:    999px;
+
+  /* ---------- Sombras ---------- */
+  --df-shadow-sm:      0 1px 2px rgba(15, 36, 25, .06), 0 2px 8px -2px rgba(15, 36, 25, .08);
+  --df-shadow:         0 1px 3px rgba(15, 36, 25, .06), 0 8px 24px -12px rgba(15, 36, 25, .16);
+  --df-shadow-lg:      0 12px 40px -12px rgba(15, 36, 25, .24);
+
+  /* ---------- Movimento ---------- */
+  --df-transition:     .2s cubic-bezier(.16, 1, .3, 1);
+
+  /* ---------- Superfícies translúcidas ---------- */
+  --df-glass:          rgba(255, 255, 255, .82);
+  --df-overlay:        rgba(15, 36, 25, .45);
+}
+
+/* ============================================================
+   TEMA ESCURO
+   ============================================================ */
+[data-theme="dark"] {
+
+  color-scheme: dark;
+
+  --df-scrollbar-thumb:       #2c3d34;
+  --df-scrollbar-thumb-hover: #3f5647;
+  --df-scrollbar-track:       transparent;
+
+  --df-primary:        #22c55e;
+  --df-primary-hover:  #16a34a;
+  --df-primary-active: #15803d;
+  --df-primary-soft:   rgba(34, 197, 94, .14);
+  --df-primary-soft-2: rgba(34, 197, 94, .08);
+  --df-primary-border: rgba(34, 197, 94, .32);
+
+  --df-accent:         #38bdf8;
+  --df-accent-hover:   #0ea5e9;
+  --df-accent-soft:    rgba(56, 189, 248, .14);
+  --df-accent-border:  rgba(56, 189, 248, .32);
+
+  --df-text:           #e8f1ec;
+  --df-text-soft:      #a5bbb0;
+  --df-text-muted:     #74897e;
+
+  --df-bg:             #0b1410;
+  --df-surface:        #121d18;
+  --df-surface-2:      #17241d;
+  --df-border:         #223029;
+  --df-border-strong:  #33473c;
+
+  --df-success:        #34d399;
+  --df-success-soft:   rgba(52, 211, 153, .15);
+  --df-success-border: rgba(52, 211, 153, .30);
+  --df-warn:           #fbbf24;
+  --df-warn-soft:      rgba(251, 191, 36, .15);
+  --df-warn-border:    rgba(251, 191, 36, .30);
+  --df-danger:         #f87171;
+  --df-danger-soft:    rgba(248, 113, 113, .15);
+  --df-danger-border:  rgba(248, 113, 113, .30);
+  --df-info:           #38bdf8;
+  --df-info-soft:      rgba(56, 189, 248, .15);
+  --df-info-border:    rgba(56, 189, 248, .30);
+
+  --df-shadow-sm:      0 1px 2px rgba(0, 0, 0, .5);
+  --df-shadow:         0 8px 24px -14px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .02);
+  --df-shadow-lg:      0 20px 50px -20px rgba(0, 0, 0, .85);
+
+  --df-glass:          rgba(11, 20, 16, .78);
+  --df-overlay:        rgba(0, 0, 0, .6);
+}
+
+/* ============================================================
+   ÍCONES LUCIDE — espessura e dimensão padrão
+   ============================================================ */
+i[data-lucide],
+.lucide {
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+.icon-residuo {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  color: var(--df-primary);
+}
+
+/* ============================================================
+   BOTÃO FLUTUANTE DE TEMA (injetado por js/tema.js)
+   ============================================================ */
+.df-tema-toggle {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 900;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--df-surface);
+  color: var(--df-text-soft);
+  border: 1px solid var(--df-border);
+  box-shadow: var(--df-shadow);
+  cursor: pointer;
+  transition: all var(--df-transition);
+}
+.df-tema-toggle:hover {
+  color: var(--df-primary);
+  border-color: var(--df-primary-border);
+  transform: translateY(-2px);
+}
+.df-tema-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Deslocamento extra do botão flutuante quando havia sidebar — removido junto com a
+   sidebar da home (o botão de tema da home fica no header). */
+
+/* ============================================================
+   AJUSTES DE TEMA ESCURO
+   Componentes que ainda usavam cor fixa (não-token) nos CSS antigos.
+   Usam [data-theme="dark"] (maior especificidade) para vencer as regras.
+   ============================================================ */
+
+/* ---------- Páginas públicas (pages.css) ---------- */
+[data-theme="dark"] .header { background-color: var(--df-glass); }
+[data-theme="dark"] .page-hero {
+  background: linear-gradient(180deg, var(--df-primary-soft-2) 0%, transparent 70%, var(--df-bg) 100%);
+}
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .residuo-checkbox-label { background-color: var(--df-surface); }
+[data-theme="dark"] .footer { background-color: var(--df-surface); }
+[data-theme="dark"] .header__nav { background-color: var(--df-surface); }
+[data-theme="dark"] .comentario-text { color: var(--df-text-soft); }
+
+/* ---------- Home (index.css) ---------- */
+[data-theme="dark"] body.app-body { background: var(--df-bg); color: var(--df-text); }
+[data-theme="dark"] .mapa-fullscreen { background: #0d1a13; }
+
+[data-theme="dark"] .barra-busca { background: var(--df-surface); }
+[data-theme="dark"] .barra-busca__input { color: var(--df-text); }
+[data-theme="dark"] .barra-busca__input::placeholder { color: var(--df-text-muted); }
+[data-theme="dark"] .barra-busca__btn { color: var(--df-text-soft); }
+[data-theme="dark"] .barra-busca__btn:hover { background: var(--df-surface-2); }
+[data-theme="dark"] .barra-busca__divider { background: var(--df-border); }
+
+[data-theme="dark"] .chip { background: var(--df-surface); color: var(--df-text-soft); }
+[data-theme="dark"] .chip:not(.chip--ativo):hover { background: var(--df-primary-soft); border-color: var(--df-primary-border); }
+[data-theme="dark"] .chip--ativo { background: var(--df-primary); color: #05130d; border-color: var(--df-primary); }
+[data-theme="dark"] .chip--ativo:hover { background: var(--df-primary-hover); }
+
+[data-theme="dark"] .btn-localizacao { background: var(--df-surface); color: var(--df-accent); }
+
+[data-theme="dark"] .menu-drawer { background: var(--df-surface); }
+[data-theme="dark"] .menu-drawer__header,
+[data-theme="dark"] .menu-drawer__footer { border-color: var(--df-border); }
+[data-theme="dark"] .menu-drawer__brand-nome { color: var(--df-text); }
+[data-theme="dark"] .menu-drawer__brand-icon { background: var(--df-primary-soft); color: var(--df-primary); }
+[data-theme="dark"] .menu-drawer__item { color: var(--df-text-soft); }
+[data-theme="dark"] .menu-drawer__item:hover { background: var(--df-surface-2); }
+[data-theme="dark"] .menu-drawer__item--ativo { background: var(--df-primary-soft); color: var(--df-primary); }
+[data-theme="dark"] .menu-drawer__item-icon { background: var(--df-surface-2); }
+[data-theme="dark"] .menu-drawer__item--ativo .menu-drawer__item-icon { background: var(--df-primary-soft); }
+
+[data-theme="dark"] .filtros-avancados { background: var(--df-surface); }
+[data-theme="dark"] .filtros-avancados__titulo { color: var(--df-text); }
+[data-theme="dark"] .filtros-avancados__select {
+  background-color: var(--df-surface-2);
+  color: var(--df-text);
+  border-color: var(--df-border);
+}
+
+[data-theme="dark"] .bottom-sheet { background: var(--df-surface); }
+[data-theme="dark"] .bottom-sheet__handle { background: var(--df-border-strong); }
+[data-theme="dark"] .bottom-sheet__titulo { color: var(--df-text); }
+[data-theme="dark"] .bottom-sheet__btn-toggle { background: var(--df-surface-2); color: var(--df-text-soft); }
+[data-theme="dark"] .bottom-sheet__btn-toggle:hover { background: var(--df-border); }
+
+[data-theme="dark"] .card-ponto-sheet { background: var(--df-surface); border-color: var(--df-border); }
+[data-theme="dark"] .card-ponto-sheet:hover { background: var(--df-surface-2); border-color: var(--df-primary-border); }
+[data-theme="dark"] .card-ponto-sheet__nome { color: var(--df-text); }
+[data-theme="dark"] .card-ponto-sheet__distancia { color: var(--df-accent); background: var(--df-accent-soft); }
+[data-theme="dark"] .card-ponto-sheet__endereco { color: var(--df-text-soft); }
+[data-theme="dark"] .tag-residuo { background: var(--df-primary-soft); color: var(--df-primary); border-color: var(--df-primary-border); }
+
+[data-theme="dark"] .skeleton-card {
+  background: linear-gradient(90deg, var(--df-surface-2) 25%, var(--df-border) 50%, var(--df-surface-2) 75%);
+  background-size: 200% 100%;
+}
+[data-theme="dark"] .lista__carregando,
+[data-theme="dark"] .lista__vazia p { color: var(--df-text-muted); }
+
+[data-theme="dark"] .sidebar-desktop { background: var(--df-surface); border-color: var(--df-border); }
+[data-theme="dark"] .sidebar-desktop__header { background: var(--df-surface); border-color: var(--df-border); }
+[data-theme="dark"] .sidebar-desktop__brand-nome { color: var(--df-text); }
+[data-theme="dark"] .sidebar-desktop__brand-icon { background: var(--df-primary-soft); color: var(--df-primary); }
+[data-theme="dark"] .sidebar-desktop__nav { background: var(--df-surface-2); border-color: var(--df-border); }
+[data-theme="dark"] .sidebar-nav__item { color: var(--df-text-soft); }
+[data-theme="dark"] .sidebar-nav__item:hover { background: var(--df-surface); color: var(--df-text); }
+[data-theme="dark"] .sidebar-nav__item--ativo { background: var(--df-surface); color: var(--df-primary); }
+[data-theme="dark"] .sidebar-desktop__contador { border-color: var(--df-border); }
+[data-theme="dark"] .sidebar-desktop__contador-titulo { color: var(--df-text); }
+[data-theme="dark"] .badge-demo { background: var(--df-warn-soft); color: var(--df-warn); border-color: var(--df-warn-border); }
+
+/* ---------- Painel administrativo (admin.css) ---------- */
+[data-theme="dark"] .admin-topbar { background-color: var(--df-surface); }
+[data-theme="dark"] .admin-sidebar__footer,
+[data-theme="dark"] .sidebar__footer { background-color: var(--df-surface); }
+
+[data-theme="dark"] .admin-table-container { background-color: var(--df-surface); }
+[data-theme="dark"] .admin-table td,
+[data-theme="dark"] .tabela-admin td { background-color: var(--df-surface); }
+[data-theme="dark"] .admin-table thead,
+[data-theme="dark"] .tabela-admin thead { background-color: var(--df-surface-2); }
+[data-theme="dark"] .admin-table tbody tr:hover td,
+[data-theme="dark"] .tabela-admin tbody tr:hover td { background-color: var(--df-surface-2); }
+
+[data-theme="dark"] .admin-btn--secundario,
+[data-theme="dark"] .botao--secundario { background-color: var(--df-surface); }
+
+[data-theme="dark"] .admin-input,
+[data-theme="dark"] .admin-select,
+[data-theme="dark"] .admin-textarea,
+[data-theme="dark"] .campo__input,
+[data-theme="dark"] .campo__select,
+[data-theme="dark"] .campo__textarea {
+  background-color: var(--df-surface);
+  border-color: var(--df-border-strong);
+  color: var(--df-text);
+}
+[data-theme="dark"] .admin-input::placeholder,
+[data-theme="dark"] .admin-textarea::placeholder { color: var(--df-text-muted); }
+
+[data-theme="dark"] .admin-modal__box,
+[data-theme="dark"] .modal { background-color: var(--df-surface); }
+[data-theme="dark"] .admin-login-panel { background-color: var(--df-surface); }
+[data-theme="dark"] .admin-skeleton {
+  background: linear-gradient(90deg, var(--df-surface-2) 25%, var(--df-border) 50%, var(--df-surface-2) 75%);
+}

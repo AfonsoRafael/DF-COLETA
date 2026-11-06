@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso Administrativo – DF Coleta</title>
+
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS do Painel Administrativo -->
+  <link rel="stylesheet" href="../../css/admin.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Supabase Auth (login real) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/supabase-config.js"></script>
+  <script src="../../js/tema.js"></script>
+</head>
+<body class="admin-login-page">
+
+  <div class="admin-login-layout">
+    
+    <!-- Painel Esquerdo: Branding e Institucional (Desktop) -->
+    <div class="admin-login-hero">
+      <div class="admin-login-hero__brand">
+        <div class="admin-login-hero__badge">
+          <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+          <span>Painel Governamental de Gestão</span>
+        </div>
+      </div>
+
+      <div class="admin-login-hero__content">
+        <div class="admin-login-hero__icon-circle">
+          <i data-lucide="recycle"></i>
+        </div>
+        <h1 class="admin-login-hero__title">
+          Gestão Sustentável e Inteligente de Resíduos
+        </h1>
+        <p class="admin-login-hero__desc">
+          Controle centralizado dos pontos de descarte, fluxo de materiais, feedback dos cidadãos e relatórios operacionais do Distrito Federal.
+        </p>
+
+        <div class="admin-login-hero__features">
+          <div class="admin-login-hero__feat-item">
+            <i data-lucide="check-circle-2" style="color: #86efac; width: 20px; height: 20px;"></i>
+            <span>Monitoramento em tempo real de todos os ecopontos</span>
+          </div>
+          <div class="admin-login-hero__feat-item">
+            <i data-lucide="check-circle-2" style="color: #86efac; width: 20px; height: 20px;"></i>
+            <span>Moderação de comentários e relatos da comunidade</span>
+          </div>
+          <div class="admin-login-hero__feat-item">
+            <i data-lucide="check-circle-2" style="color: #86efac; width: 20px; height: 20px;"></i>
+            <span>Catálogo atualizado de materiais e descarte correto</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-login-hero__footer">
+        DF Coleta &copy; 2026 &bull; Distrito Federal, Brasil
+      </div>
+    </div>
+
+    <!-- Painel Direito: Formulário de Autenticação -->
+    <div class="admin-login-panel">
+      <div class="admin-login-box">
+
+        <!-- Logo para versão mobile -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background-color: #dcfce7; color: #166534; display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="recycle" style="width: 24px; height: 24px;"></i>
+          </div>
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700; color: #166534; line-height: 1.1;">DF Coleta</h2>
+            <span style="font-size: 0.72rem; font-weight: 600; text-transform: uppercase; color: var(--admin-text-muted); letter-spacing: 0.05em;">Administração</span>
+          </div>
+        </div>
+
+        <div class="admin-login-box__header">
+          <h2 class="admin-login-box__title">Acesso Administrativo</h2>
+          <p class="admin-login-box__subtitle">Digite suas credenciais para gerenciar a plataforma.</p>
+        </div>
+
+        <!-- Alerta de Erro -->
+        <div id="msgErro" class="admin-badge admin-badge--perigo" style="display: none; width: 100%; padding: 12px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 0.84rem; font-weight: 500; line-height: 1.4;">
+          <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span id="txtErro">E-mail ou senha incorretos.</span>
+        </div>
+
+        <!-- Aviso de modo local (some quando o Supabase está configurado) -->
+        <div id="avisoModoLocal" class="admin-badge" style="display: none; width: 100%; padding: 12px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 0.8rem; font-weight: 500; line-height: 1.4; background: #fef3c7; color: #92400e;">
+          <i data-lucide="info" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span>Modo local: o Supabase ainda não foi configurado. A senha de demonstração é <strong>admin123</strong>.</span>
+        </div>
+
+        <!-- Formulário de Login -->
+        <form id="formLogin" novalidate>
+          <div class="admin-form-group">
+            <label class="admin-label" for="email">E-mail Institucional</label>
+            <div class="admin-input-wrapper">
+              <span class="admin-input-icon">
+                <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+              </span>
+              <input
+                type="email"
+                id="email"
+                class="admin-input"
+                placeholder="admin@dfcoleta.gov.br"
+                required
+                autofocus
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label class="admin-label" for="senha">Senha de Acesso</label>
+            <div class="admin-input-wrapper">
+              <span class="admin-input-icon">
+                <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
+              </span>
+              <input
+                type="password"
+                id="senha"
+                class="admin-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                id="btnToggleSenha"
+                class="admin-input-toggle"
+                title="Mostrar/Ocultar senha"
+                aria-label="Alternar visualização da senha"
+              >
+                <i id="iconeToggleSenha" data-lucide="eye" style="width: 18px; height: 18px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; font-size: 0.84rem;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--admin-text-muted); user-select: none;">
+              <input type="checkbox" id="lembrarAcesso" style="width: 16px; height: 16px; accent-color: #166534; cursor: pointer;" />
+              <span>Lembrar acesso</span>
+            </label>
+            <span id="dicaSenha" style="color: var(--admin-text-muted); font-size: 0.78rem;">Senha demo: <code>admin123</code></span>
+          </div>
+
+          <button
+            type="submit"
+            id="btnEntrar"
+            class="admin-btn"
+            style="width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600;"
+          >
+            <span id="btnEntrarTexto">Entrar no Painel</span>
+            <i id="btnEntrarIcone" data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </button>
+        </form>
+
+        <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--admin-card-border); text-align: center;">
+          <a
+            href="../../index.html"
+            style="display: inline-flex; align-items: center; gap: 8px; color: var(--admin-text-muted); font-size: 0.86rem; font-weight: 500; text-decoration: none; transition: color 0.15s ease;"
+            onmouseover="this.style.color='#166534'"
+            onmouseout="this.style.color='var(--admin-text-muted)'"
+          >
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+            <span>Voltar ao site público</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Se já estiver logado, redireciona diretamente para o dashboard
+    if (sessionStorage.getItem('df_admin_token')) {
+      window.location.href = 'dashboard.html';
+    }
+
+    // Inicialização dos ícones Lucide
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    const configSupabase = window.DF_SUPABASE || {};
+    const modoSupabase = Boolean(
+      configSupabase.url &&
+      configSupabase.anonKey &&
+      window.supabase &&
+      typeof window.supabase.createClient === 'function'
+    );
+
+    const clienteSupabase = modoSupabase
+      ? window.supabase.createClient(configSupabase.url, configSupabase.anonKey, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        })
+      : null;
+
+    // Em modo local, mostra o aviso e a dica da senha de demonstração
+    if (!modoSupabase) {
+      const aviso = document.getElementById('avisoModoLocal');
+      if (aviso) aviso.style.display = 'inline-flex';
+    } else {
+      const dica = document.getElementById('dicaSenha');
+      if (dica) dica.style.display = 'none';
+    }
+
+    // Preenche e-mail salvo se a opção "Lembrar acesso" tiver sido usada anteriormente
+    const emailSalvo = localStorage.getItem('admin_lembrar_email');
+    if (emailSalvo) {
+      const emailInput = document.getElementById('email');
+      emailInput.value = emailSalvo;
+      document.getElementById('lembrarAcesso').checked = true;
+    }
+
+    // Toggle de visibilidade da senha
+    const btnToggleSenha = document.getElementById('btnToggleSenha');
+    const inputSenha = document.getElementById('senha');
+    btnToggleSenha.addEventListener('click', () => {
+      const isPassword = inputSenha.type === 'password';
+      inputSenha.type = isPassword ? 'text' : 'password';
+
+      // Atualiza o ícone (eye vs eye-off)
+      const iconeContainer = document.getElementById('btnToggleSenha');
+      iconeContainer.innerHTML = isPassword
+        ? '<i data-lucide="eye-off" style="width: 18px; height: 18px;"></i>'
+        : '<i data-lucide="eye" style="width: 18px; height: 18px;"></i>';
+      lucide.createIcons();
+    });
+
+    // Submissão do formulário de autenticação
+    const formLogin = document.getElementById('formLogin');
+    const msgErro = document.getElementById('msgErro');
+    const txtErro = document.getElementById('txtErro');
+    const btnEntrar = document.getElementById('btnEntrar');
+    const btnEntrarTexto = document.getElementById('btnEntrarTexto');
+
+    function exibirErro(mensagem) {
+      txtErro.textContent = mensagem;
+      msgErro.style.display = 'inline-flex';
+      btnEntrar.disabled = false;
+      btnEntrarTexto.textContent = 'Entrar no Painel';
+      document.getElementById('senha').focus();
+      document.getElementById('senha').select();
+      lucide.createIcons();
+    }
+
+    function concluirLogin(token, refresh, email) {
+      sessionStorage.setItem('df_admin_token', token);
+      if (refresh) sessionStorage.setItem('df_admin_refresh', refresh);
+      sessionStorage.setItem('df_admin_email', email);
+
+      // Compatibilidade com telas antigas
+      sessionStorage.setItem('admin_autenticado', 'true');
+      sessionStorage.setItem('admin_email', email);
+
+      const lembrar = document.getElementById('lembrarAcesso').checked;
+      if (lembrar) {
+        localStorage.setItem('admin_lembrar_email', email);
+      } else {
+        localStorage.removeItem('admin_lembrar_email');
+      }
+
+      btnEntrarTexto.textContent = 'Acesso liberado!';
+      window.location.href = 'dashboard.html';
+    }
+
+    formLogin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msgErro.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+
+      if (!email || !senha) {
+        exibirErro('Informe o e-mail e a senha.');
+        return;
+      }
+
+      // Estado de carregamento no botão
+      btnEntrar.disabled = true;
+      btnEntrarTexto.textContent = 'Verificando...';
+
+      // ---------------------------------------------------------------
+      // Login real via Supabase Auth
+      // ---------------------------------------------------------------
+      if (modoSupabase) {
+        try {
+          const { data, error } = await clienteSupabase.auth.signInWithPassword({
+            email,
+            password: senha,
+          });
+
+          if (error) {
+            const mensagem =
+              /invalid login credentials/i.test(error.message)
+                ? 'E-mail ou senha incorretos.'
+                : /email not confirmed/i.test(error.message)
+                  ? 'E-mail ainda não confirmado. Confirme o usuário no Supabase.'
+                  : error.message;
+            exibirErro(mensagem);
+            return;
+          }
+
+          if (!data?.session) {
+            exibirErro('Não foi possível iniciar a sessão. Confirme o usuário no Supabase.');
+            return;
+          }
+
+          concluirLogin(
+            data.session.access_token,
+            data.session.refresh_token,
+            data.user?.email || email,
+          );
+        } catch (erro) {
+          exibirErro(
+            navigator.onLine
+              ? 'Falha ao conectar com o Supabase. Tente novamente.'
+              : 'Sem conexão com a internet.',
+          );
+        }
+        return;
+      }
+
+      // ---------------------------------------------------------------
+      // Modo local (Supabase ainda não configurado)
+      // ---------------------------------------------------------------
+      await new Promise((r) => setTimeout(r, 300));
+
+      if (senha === 'admin123') {
+        concluirLogin('mock-local', null, email || 'admin@dfcoleta.com');
+      } else {
+        exibirErro('Senha incorreta. No modo local, use admin123.');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comentários – Admin DF Coleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../../js/tema.js"></script>
+  <link rel="stylesheet" href="../../css/admin.css" />
+  <style>
+    .grid-comentarios {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    @media (max-width: 640px) {
+      .grid-comentarios {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card-comentario {
+      background: var(--admin-card-bg);
+      border: 1px solid var(--admin-card-border);
+      border-radius: var(--admin-radius-card, 16px);
+      padding: 20px;
+      box-shadow: var(--admin-shadow-sm, 0 1px 3px 0 rgba(0,0,0,0.08));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .card-comentario:hover {
+      box-shadow: var(--admin-shadow-md, 0 4px 6px -1px rgba(0,0,0,0.08));
+      border-color: var(--admin-card-border);
+      transform: translateY(-2px);
+    }
+    .card-comentario__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .card-comentario__autor {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar-autor {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .autor-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .autor-nome {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--admin-text);
+      line-height: 1.2;
+    }
+    .autor-email {
+      font-size: 0.78rem;
+      color: var(--admin-text-light);
+      margin-top: 2px;
+    }
+    .card-comentario__texto {
+      font-size: 0.92rem;
+      color: var(--admin-text-muted);
+      line-height: 1.6;
+      background: var(--admin-neutral-bg);
+      padding: 14px 16px;
+      border-radius: var(--admin-radius-sm, 8px);
+      flex: 1;
+    }
+    .card-comentario__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--admin-card-border);
+    }
+    .card-comentario__ponto {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--admin-primary);
+      background: var(--admin-primary-light);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #dcfce7;
+      text-decoration: none;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-comentario__data {
+      font-size: 0.75rem;
+      color: var(--admin-text-light);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-comentario__meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-comentario__like {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #e11d48;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+    .card-comentario__like i,
+    .card-comentario__like svg {
+      width: 12px;
+      height: 12px;
+    }
+    .card-comentario__resposta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--admin-primary);
+      background: var(--admin-primary-light);
+    }
+    .card-comentario__resposta i,
+    .card-comentario__resposta svg {
+      width: 12px;
+      height: 12px;
+    }
+    [data-theme="dark"] .card-comentario__like {
+      color: #fb7185;
+      background: rgba(251, 113, 133, 0.12);
+      border-color: rgba(251, 113, 133, 0.3);
+    }
+    /* Estado vazio dentro do grid vira um painel, como os cards */
+    .grid-comentarios .empty-state {
+      background: var(--admin-card-bg);
+      border: 1px solid var(--admin-card-border);
+      border-radius: var(--admin-radius-card, 16px);
+    }
+    .btn-acao-perigo:hover {
+      background-color: var(--admin-danger-bg) !important;
+      color: var(--admin-danger-text) !important;
+      border-color: var(--admin-danger-border) !important;
+    }
+    /* Resposta oficial da equipe */
+    .card-comentario--oficial {
+      border-color: var(--admin-primary-border);
+      background: linear-gradient(180deg, var(--admin-primary-tint), var(--admin-card-bg) 60%);
+    }
+    .selo-oficial {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--admin-primary);
+      background: var(--admin-primary-light);
+      border: 1px solid var(--admin-primary-border);
+      white-space: nowrap;
+    }
+    .selo-oficial i,
+    .selo-oficial svg {
+      width: 12px;
+      height: 12px;
+    }
+    .card-comentario__acoes-topo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-responder-oficial {
+      white-space: nowrap;
+    }
+    .resposta-contexto {
+      background: var(--admin-neutral-bg);
+      border-left: 3px solid var(--admin-primary-border);
+      border-radius: var(--admin-radius-sm);
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      color: var(--admin-text-muted);
+      line-height: 1.5;
+      max-height: 130px;
+      overflow: auto;
+    }
+    .resposta-contexto strong {
+      color: var(--admin-text);
+    }
+    .resposta-oficial-aviso {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: var(--admin-radius-sm);
+      background: var(--admin-primary-tint);
+      border: 1px solid var(--admin-primary-border);
+      color: var(--admin-text-muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .resposta-oficial-aviso i,
+    .resposta-oficial-aviso svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--admin-primary);
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay Drawer Mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <!-- Toast -->
+  <div id="toastNotificacao" class="admin-toast" role="status" aria-live="polite">
+    <i id="toastIcone" data-lucide="check-circle-2"></i>
+    <span id="toastMensagem">Mensagem</span>
+  </div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon"><i data-lucide="recycle"></i></div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button class="admin-sidebar__close-btn" onclick="fecharSidebar()" aria-label="Fechar menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button class="admin-topbar__menu-btn admin-topbar__toggle" onclick="toggleSidebar()" aria-label="Abrir menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__titulo admin-topbar__title">Comentários dos Cidadãos</h1>
+            <span class="admin-topbar__subtitle">Moderação de avaliações e opiniões sobre os locais de coleta</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar__acoes admin-topbar__right">
+          <button class="admin-btn admin-btn--secundario" onclick="carregarDados()" title="Atualizar dados">
+            <i data-lucide="rotate-ccw"></i>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Cards de Estatísticas -->
+        <div class="admin-stat-grid admin-stat-grid--2">
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Total de Comentários</span>
+              <span class="admin-stat-card__value" id="statTotalComentarios">–</span>
+              <span class="admin-stat-card__meta">Feedback recebido da comunidade</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+              <i data-lucide="message-square"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Pontos Avaliados</span>
+              <span class="admin-stat-card__value" id="statPontosAvaliados">–</span>
+              <span class="admin-stat-card__meta">Locais com registros de comentários</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="map-pin"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-card">
+          <div class="filtros-grid">
+            <div class="busca-wrapper">
+              <i data-lucide="search"></i>
+              <input 
+                type="text" 
+                id="inputBusca" 
+                class="admin-input" 
+                placeholder="Buscar por nome do cidadão, e-mail ou conteúdo..." 
+                oninput="aoDigitarBusca()"
+              />
+              <button class="btn-limpar-busca" id="btnLimparBusca" onclick="limparBusca()" title="Limpar busca">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <select id="filtroPonto" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todos os Pontos de Coleta</option>
+            </select>
+
+            <button class="admin-btn admin-btn--secundario" onclick="resetarFiltros()" title="Limpar filtros">
+              <i data-lucide="filter-x"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cabeçalho da Lista -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 1.05rem; font-weight: 600; color: var(--admin-text); display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="messages-square" style="width: 20px; height: 20px; color: var(--admin-primary);"></i>
+            <span>Comentários Recebidos</span>
+          </h2>
+          <span style="font-size: 0.82rem; color: var(--admin-text-muted);" id="labelContagemResultados">Carregando comentários...</span>
+        </div>
+
+        <!-- Grid de Cards de Comentários -->
+        <div class="grid-comentarios" id="listaComentarios">
+          <!-- Skeleton Loading de Cards -->
+          <div class="card-comentario">
+            <div class="card-comentario__top">
+              <div class="card-comentario__autor">
+                <div class="admin-skeleton admin-skeleton-circle" style="width: 44px; height: 44px;"></div>
+                <div>
+                  <div class="admin-skeleton admin-skeleton-title" style="width: 120px;"></div>
+                  <div class="admin-skeleton admin-skeleton-text" style="width: 160px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-skeleton admin-skeleton-text" style="height: 50px; border-radius: 8px;"></div>
+            <div class="card-comentario__footer">
+              <div class="admin-skeleton admin-skeleton-text" style="width: 100px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 80px;"></div>
+            </div>
+          </div>
+          <div class="card-comentario">
+            <div class="card-comentario__top">
+              <div class="card-comentario__autor">
+                <div class="admin-skeleton admin-skeleton-circle" style="width: 44px; height: 44px;"></div>
+                <div>
+                  <div class="admin-skeleton admin-skeleton-title" style="width: 140px;"></div>
+                  <div class="admin-skeleton admin-skeleton-text" style="width: 150px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-skeleton admin-skeleton-text" style="height: 50px; border-radius: 8px;"></div>
+            <div class="card-comentario__footer">
+              <div class="admin-skeleton admin-skeleton-text" style="width: 100px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 80px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div class="admin-modal" id="modalExclusao">
+    <div class="admin-modal__box" style="max-width: 440px; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: var(--admin-danger-bg); color: var(--admin-danger-text); display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="trash-2" style="width: 28px; height: 28px;"></i>
+        </div>
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Excluir Comentário</h3>
+      <p style="font-size: 0.88rem; color: var(--admin-text-muted); line-height: 1.5; margin-bottom: 24px;">
+        Tem certeza que deseja apagar o comentário de <strong id="nomeAutorExclusao"></strong>? Esta ação é definitiva.
+      </p>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalExclusao()">
+          Cancelar
+        </button>
+        <button type="button" class="admin-btn admin-btn--perigo" id="btnConfirmarExclusao" onclick="executarExclusao()">
+          <i data-lucide="trash-2"></i>
+          <span>Sim, Excluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Resposta Oficial -->
+  <div class="admin-modal" id="modalResposta">
+    <div class="admin-modal__box" style="max-width: 560px;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--admin-primary-light); color: var(--admin-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="badge-check" style="width: 22px; height: 22px;"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin: 0;">Resposta oficial</h3>
+            <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin: 2px 0 0;">Publicada como Equipe DF Coleta, com selo de verificado.</p>
+          </div>
+        </div>
+        <button type="button" class="admin-btn admin-btn--secundario admin-btn--icon" onclick="fecharModalResposta()" title="Fechar" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="resposta-contexto" id="respostaContexto"></div>
+
+      <div class="resposta-oficial-aviso">
+        <i data-lucide="shield-check"></i>
+        <span>A resposta aparecerá no site identificada como <strong>Equipe DF Coleta</strong> e não poderá ser editada depois.</span>
+      </div>
+
+      <form id="formRespostaOficial" onsubmit="enviarRespostaOficial(event)">
+        <div class="admin-form-group">
+          <label for="textoRespostaOficial">Sua resposta</label>
+          <textarea
+            id="textoRespostaOficial"
+            class="admin-textarea"
+            rows="5"
+            maxlength="2000"
+            required
+            placeholder="Escreva a resposta oficial ao cidadão..."
+          ></textarea>
+          <span id="contadorResposta" style="font-size: 0.75rem; color: var(--admin-text-light); align-self: flex-end;">0/2000</span>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px;">
+          <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalResposta()">Cancelar</button>
+          <button type="submit" class="admin-btn" id="btnEnviarResposta">
+            <i data-lucide="send"></i>
+            <span>Publicar resposta</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    verificarAuth();
+
+    const API = DF_API_BASE;
+    let todosComentarios = [];
+    let mapaPontos = new Map();
+    let comentarioIdParaExcluir = null;
+    let comentarioIdParaResponder = null;
+    let debounceBuscaTimer = null;
+
+    /** Escapa texto vindo da API antes de montar o HTML. */
+    function esc(valor) {
+      return String(valor == null ? '' : valor).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    // Toast
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const toast = document.getElementById('toastNotificacao');
+      const texto = document.getElementById('toastMensagem');
+      const icone = document.getElementById('toastIcone');
+
+      texto.textContent = mensagem;
+      toast.className = `admin-toast admin-toast--${tipo} visivel`;
+
+      if (tipo === 'sucesso') {
+        icone.setAttribute('data-lucide', 'check-circle-2');
+      } else {
+        icone.setAttribute('data-lucide', 'alert-circle');
+      }
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('visivel');
+      }, 3500);
+    }
+
+    async function carregarDados() {
+      try {
+        await Promise.all([carregarPontos(), carregarComentarios()]);
+      } catch (err) {
+        console.error('Erro ao carregar dados:', err);
+      }
+    }
+
+    async function carregarPontos() {
+      try {
+        const res = await fetch(`${API}/pontos-coleta?todos=true`);
+        const pontos = await res.json();
+        if (Array.isArray(pontos)) {
+          const select = document.getElementById('filtroPonto');
+          select.innerHTML = '<option value="">Todos os Pontos de Coleta</option>';
+          pontos.forEach(p => {
+            mapaPontos.set(p.id, p.nome);
+            select.innerHTML += `<option value="${p.id}">#${p.id} - ${esc(p.nome)}</option>`;
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao carregar pontos:', err);
+      }
+    }
+
+    async function carregarComentarios() {
+      try {
+        const res = await fetch(`${API}/comentarios`);
+        const data = await res.json();
+        todosComentarios = Array.isArray(data) ? data : [];
+        aplicarFiltros();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro ao buscar comentários:', err);
+        document.getElementById('listaComentarios').innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-state__icon" style="background: var(--admin-danger-bg); color: var(--admin-danger-text);">
+              <i data-lucide="alert-circle"></i>
+            </div>
+            <div class="empty-state__title">Erro ao carregar comentários</div>
+            <div class="empty-state__desc">Não foi possível conectar ao endpoint ${API}/comentarios.</div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function atualizarEstatisticas() {
+      document.getElementById('statTotalComentarios').textContent = todosComentarios.length;
+      const pontosDistintos = new Set(todosComentarios.map(c => c.ponto_coleta_id).filter(Boolean));
+      document.getElementById('statPontosAvaliados').textContent = pontosDistintos.size;
+    }
+
+    // Debounce busca
+    function aoDigitarBusca() {
+      const val = document.getElementById('inputBusca').value.trim();
+      document.getElementById('btnLimparBusca').style.display = val ? 'block' : 'none';
+      clearTimeout(debounceBuscaTimer);
+      debounceBuscaTimer = setTimeout(aplicarFiltros, 200);
+    }
+
+    function limparBusca() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      aplicarFiltros();
+    }
+
+    function resetarFiltros() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      document.getElementById('filtroPonto').value = '';
+      aplicarFiltros();
+    }
+
+    function aplicarFiltros() {
+      const termo = (document.getElementById('inputBusca').value || '').toLowerCase().trim();
+      const pontoId = document.getElementById('filtroPonto').value;
+
+      const filtrados = todosComentarios.filter(c => {
+        if (pontoId && String(c.ponto_coleta_id) !== String(pontoId)) {
+          return false;
+        }
+
+        if (termo) {
+          const nomeMatch = (c.nome_autor || '').toLowerCase().includes(termo);
+          const emailMatch = (c.email_autor || '').toLowerCase().includes(termo);
+          const textoMatch = (c.texto_comentario || '').toLowerCase().includes(termo);
+          if (!nomeMatch && !emailMatch && !textoMatch) return false;
+        }
+
+        return true;
+      });
+
+      renderizarCards(filtrados);
+    }
+
+    // Cores aleatórias estáveis para avatar baseadas no nome
+    function obterCorAvatar(nome) {
+      const paletas = [
+        { bg: '#dcfce7', text: '#166534' },
+        { bg: '#dbeafe', text: '#1e40af' },
+        { bg: '#fef3c7', text: '#92400e' },
+        { bg: '#f3e8ff', text: '#6b21a8' },
+        { bg: '#ffedd5', text: '#9a3412' },
+        { bg: '#e0e7ff', text: '#3730a3' }
+      ];
+      let hash = 0;
+      for (let i = 0; i < (nome || '').length; i++) {
+        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return paletas[Math.abs(hash) % paletas.length];
+    }
+
+    function renderizarCards(lista) {
+      const container = document.getElementById('listaComentarios');
+      const label = document.getElementById('labelContagemResultados');
+
+      label.textContent = `Exibindo ${lista.length} de ${todosComentarios.length} comentário(s)`;
+
+      if (lista.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i data-lucide="message-square-off"></i>
+            </div>
+            <div class="empty-state__title">Nenhum comentário encontrado</div>
+            <div class="empty-state__desc">Não foram encontrados comentários correspondentes aos filtros selecionados.</div>
+            <button class="admin-btn admin-btn--secundario admin-btn--sm" onclick="resetarFiltros()" style="margin-top: 8px;">
+              Limpar Filtros
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = lista.map(c => {
+        const nomeAutor = c.nome_autor || 'Cidadão';
+        const inicial = nomeAutor.trim().charAt(0).toUpperCase() || 'U';
+        const corAvatar = obterCorAvatar(nomeAutor);
+        const nomePonto = mapaPontos.get(c.ponto_coleta_id) || `Ponto #${c.ponto_coleta_id}`;
+        const dataFormatada = c.data ? new Date(c.data).toLocaleDateString('pt-BR', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : 'Data não informada';
+
+        const ehOficial = c.oficial === true;
+        const ehResposta = c.resposta_a != null;
+        const pai = ehResposta
+          ? todosComentarios.find(x => Number(x.id) === Number(c.resposta_a))
+          : null;
+
+        return `
+          <div class="card-comentario${ehOficial ? ' card-comentario--oficial' : ''}">
+            <div class="card-comentario__top">
+              <div class="card-comentario__autor">
+                <div class="avatar-autor" style="background-color: ${corAvatar.bg}; color: ${corAvatar.text};">
+                  ${esc(inicial)}
+                </div>
+                <div class="autor-info">
+                  <span class="autor-nome">${esc(nomeAutor)}</span>
+                  ${c.email_autor ? `<span class="autor-email">${esc(c.email_autor)}</span>` : '<span class="autor-email" style="font-style: italic;">Sem e-mail cadastrado</span>'}
+                  ${ehOficial ? `
+                    <span class="selo-oficial" style="align-self: flex-start; margin-top: 5px;" title="Resposta oficial da equipe">
+                      <i data-lucide="badge-check"></i>
+                      <span>Verificado</span>
+                    </span>
+                  ` : ''}
+                </div>
+              </div>
+
+              <div class="card-comentario__acoes-topo">
+                ${ehResposta ? '' : `
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--secundario admin-btn--sm btn-responder-oficial"
+                    title="Responder como Equipe DF Coleta"
+                    onclick="abrirModalResposta(${c.id})"
+                  >
+                    <i data-lucide="reply"></i>
+                    <span>Responder</span>
+                  </button>
+                `}
+                <button 
+                  class="admin-btn admin-btn--secundario admin-btn--icon btn-acao-perigo" 
+                  title="Excluir este comentário" 
+                  onclick="solicitarExclusao(${c.id})"
+                >
+                  <i data-lucide="trash-2"></i>
+                </button>
+              </div>
+            </div>
+
+            ${ehResposta && pai ? `
+              <div style="font-size: 0.78rem; color: var(--admin-text-muted); background: var(--admin-neutral-bg); border-left: 3px solid var(--admin-primary-border); border-radius: var(--admin-radius-sm); padding: 8px 10px; line-height: 1.45;">
+                Em resposta a <strong style="color: var(--admin-text);">${esc(pai.nome_autor || 'Cidadão')}</strong>:
+                <span style="font-style: italic;">"${esc((pai.texto_comentario || '').slice(0, 140))}${(pai.texto_comentario || '').length > 140 ? '…' : ''}"</span>
+              </div>
+            ` : ''}
+
+            <p class="card-comentario__texto">
+              "${esc(c.texto_comentario || '')}"
+            </p>
+
+            <div class="card-comentario__footer">
+              ${c.ponto_coleta_id ? `
+                <a href="pontos.html" class="card-comentario__ponto" title="Ver detalhes do ponto">
+                  <i data-lucide="map-pin" style="width: 12px; height: 12px;"></i>
+                  <span>${esc(nomePonto)}</span>
+                </a>
+              ` : `<span></span>`}
+
+              <div class="card-comentario__meta">
+                <span class="card-comentario__like" title="Curtidas neste comentário">
+                  <i data-lucide="heart"></i>
+                  <span>${Number(c.curtidas || 0)}</span>
+                </span>
+                ${c.resposta_a ? `
+                  <span class="card-comentario__resposta" title="Resposta ao comentário #${esc(c.resposta_a)}">
+                    <i data-lucide="reply"></i>
+                    <span>Resposta #${esc(c.resposta_a)}</span>
+                  </span>
+                ` : ''}
+                ${ehOficial ? `
+                  <span class="card-comentario__resposta" title="Enviada pelo painel administrativo">
+                    <i data-lucide="shield-check"></i>
+                    <span>Oficial</span>
+                  </span>
+                ` : ''}
+                <span class="card-comentario__data">
+                  <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+                  <span>${dataFormatada}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Modal de exclusão
+    function solicitarExclusao(id, nome) {
+      comentarioIdParaExcluir = id;
+      if (!nome) {
+        const alvo = todosComentarios.find(c => Number(c.id) === Number(id));
+        nome = (alvo && (alvo.nome_autor || 'Cidadão')) || 'Cidadão';
+      }
+      document.getElementById('nomeAutorExclusao').textContent = `"${nome}"`;
+      document.getElementById('modalExclusao').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalExclusao() {
+      document.getElementById('modalExclusao').classList.remove('aberto');
+      comentarioIdParaExcluir = null;
+    }
+
+    async function executarExclusao() {
+      if (!comentarioIdParaExcluir) return;
+      const btn = document.getElementById('btnConfirmarExclusao');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/comentarios/${comentarioIdParaExcluir}`, {
+          method: 'DELETE'
+        });
+
+        // Mesmo se o backend retornar mock ou delete real
+        todosComentarios = todosComentarios.filter(c => c.id !== comentarioIdParaExcluir);
+
+        mostrarToast('Comentário removido com sucesso!', 'sucesso');
+        fecharModalExclusao();
+        aplicarFiltros();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro ao excluir comentário:', err);
+        mostrarToast('Erro ao excluir comentário', 'erro');
+      } finally {
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    // ===== Resposta oficial da equipe =====
+    function abrirModalResposta(id) {
+      const alvo = todosComentarios.find(c => Number(c.id) === Number(id));
+      if (!alvo) return;
+
+      if (alvo.resposta_a != null) {
+        mostrarToast('Responda o comentário principal, não uma resposta.', 'erro');
+        return;
+      }
+
+      comentarioIdParaResponder = Number(id);
+
+      const contexto = document.getElementById('respostaContexto');
+      contexto.innerHTML = `
+        <strong>${esc(alvo.nome_autor || 'Cidadão')}</strong> escreveu:
+        <span style="display: block; margin-top: 4px; font-style: italic; color: var(--admin-text-muted);">
+          "${esc(alvo.texto_comentario || '')}"
+        </span>
+      `;
+
+      const campo = document.getElementById('textoRespostaOficial');
+      campo.value = '';
+      document.getElementById('contadorResposta').textContent = '0/2000';
+
+      document.getElementById('modalResposta').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalResposta() {
+      document.getElementById('modalResposta').classList.remove('aberto');
+      comentarioIdParaResponder = null;
+    }
+
+    async function enviarRespostaOficial(event) {
+      event.preventDefault();
+      if (!comentarioIdParaResponder) return;
+
+      const campo = document.getElementById('textoRespostaOficial');
+      const texto = campo.value.trim();
+
+      if (!texto) {
+        mostrarToast('Escreva a resposta antes de publicar.', 'erro');
+        campo.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnEnviarResposta');
+      const rotulo = btn.querySelector('span');
+      const rotuloOriginal = rotulo ? rotulo.textContent : '';
+      btn.disabled = true;
+      if (rotulo) rotulo.textContent = 'Publicando...';
+
+      try {
+        await responderOficialComentario(comentarioIdParaResponder, texto);
+        mostrarToast('Resposta oficial publicada!', 'sucesso');
+        fecharModalResposta();
+        await carregarComentarios();
+      } catch (err) {
+        console.error('Erro ao publicar resposta oficial:', err);
+        mostrarToast(err.message || 'Erro ao publicar a resposta oficial', 'erro');
+      } finally {
+        btn.disabled = false;
+        if (rotulo) rotulo.textContent = rotuloOriginal;
+        lucide.createIcons();
+      }
+    }
+
+    const campoResposta = document.getElementById('textoRespostaOficial');
+    if (campoResposta) {
+      campoResposta.addEventListener('input', () => {
+        document.getElementById('contadorResposta').textContent =
+          `${campoResposta.value.length}/2000`;
+      });
+    }
+
+    carregarDados();
+  </script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+/* ============================================================
+   DF COLETA — Navegação única (cabeçalho + rodapé)
+   ------------------------------------------------------------
+   Este é o ÚNICO cabeçalho e o ÚNICO rodapé do site público.
+   As 5 páginas (index, pontos, ponto-detalhe, sobre, sugestao)
+   usam exatamente a mesma marcação, então o menu nunca mais
+   "muda de cara" de uma tela para outra.
+
+   Só usa tokens (--df-*) do tokens.css, por isso funciona
+   igual no tema claro e no escuro, sem regras extras.
+
+   Inclua DEPOIS do CSS específico da página.
+   ============================================================ */
+
+/* ============================================================
+   PULAR PARA O CONTEÚDO (aparece só no foco por teclado)
+   ============================================================ */
+.pular-link {
+  position: absolute;
+  left: 12px;
+  top: -70px;
+  z-index: 2000;
+  padding: 10px 18px;
+  border-radius: 0 0 12px 12px;
+  background-color: var(--df-primary);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--df-shadow);
+  transition: top var(--df-transition);
+}
+
+.pular-link:focus {
+  top: 0;
+  color: #ffffff;
+}
+
+/* ============================================================
+   CABEÇALHO
+   ============================================================ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: var(--df-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--df-border);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+}
+
+/* ---------- Marca ---------- */
+.header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--df-text);
+  flex-shrink: 0;
+}
+
+.header__brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: var(--df-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
+  transition: var(--df-transition);
+  flex-shrink: 0;
+}
+
+.header__brand-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.header__brand:hover .header__brand-icon {
+  transform: rotate(-8deg) scale(1.05);
+}
+
+.header__brand-nome {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--df-text);
+}
+
+/* ---------- Grupo da direita (menu + tema + hambúrguer) ---------- */
+.header__direita {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header__nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--df-text-soft);
+  border-radius: var(--df-radius-sm);
+  transition: var(--df-transition);
+}
+
+.header__nav-link svg,
+.header__nav-link i {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+.header__nav-link:hover {
+  color: var(--df-primary);
+  background-color: var(--df-primary-soft-2);
+}
+
+.header__nav-link.header__nav-link--active {
+  color: var(--df-primary);
+  font-weight: 600;
+  background-color: var(--df-primary-soft-2);
+}
+
+.header__nav-link--cta {
+  background-color: var(--df-primary);
+  color: #ffffff !important;
+  border-radius: var(--df-radius-pill);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.25);
+  margin-left: 0.25rem;
+}
+
+.header__nav-link--cta:hover {
+  background-color: var(--df-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.35);
+}
+
+/* O "Sugerir" ativo continua sólido (a regra de ativo não pode clareá-lo) */
+.header__nav-link--cta.header__nav-link--active,
+.header__nav-link--cta.header__nav-link--active:hover {
+  background-color: var(--df-primary);
+  color: #ffffff !important;
+}
+
+/* ---------- Botão de tema ---------- */
+.header__tema {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--df-border);
+  border-radius: 12px;
+  background: none;
+  color: var(--df-text-soft);
+  cursor: pointer;
+  transition: var(--df-transition);
+}
+
+.header__tema:hover {
+  color: var(--df-primary);
+  background-color: var(--df-primary-soft-2);
+  border-color: var(--df-primary-border);
+}
+
+.header__tema svg,
+.header__tema i {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.2;
+}
+
+/* ---------- Botão do menu (celular) ---------- */
+.header__menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--df-border);
+  color: var(--df-text);
+  padding: 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: var(--df-transition);
+}
+
+.header__menu-btn:hover {
+  background-color: var(--df-primary-soft-2);
+}
+
+.header__menu-btn svg,
+.header__menu-btn i {
+  width: 22px;
+  height: 22px;
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+.footer {
+  background-color: var(--df-surface);
+  border-top: 1px solid var(--df-border);
+  padding: 2.5rem 1.5rem;
+  margin-top: auto;
+}
+
+.footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--df-text);
+  font-size: 1.05rem;
+}
+
+.footer__brand svg,
+.footer__brand i {
+  color: var(--df-primary);
+  width: 20px;
+  height: 20px;
+}
+
+.footer__links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.footer__links a {
+  color: var(--df-text-soft);
+  font-size: 0.875rem;
+  transition: var(--df-transition);
+}
+
+.footer__links a:hover {
+  color: var(--df-primary);
+}
+
+/* Admin discreto: só o cadeado, no fim do rodapé */
+.footer__lock {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid var(--df-border);
+  color: var(--df-text-muted);
+  transition: var(--df-transition);
+}
+
+.footer__lock:hover {
+  color: var(--df-primary);
+  border-color: var(--df-primary-border);
+  background-color: var(--df-primary-soft);
+}
+
+.footer__lock svg,
+.footer__lock i {
+  width: 14px;
+  height: 14px;
+}
+
+.footer__copy {
+  font-size: 0.875rem;
+  color: var(--df-text-soft);
+  margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@keyframes dfMenuAbre {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .header__inner {
+    padding: 0.75rem 1rem;
+  }
+
+  .header__menu-btn {
+    display: flex;
+  }
+
+  .header__nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--df-surface);
+    border-bottom: 1px solid var(--df-border);
+    box-shadow: var(--df-shadow-lg);
+    padding: 1.25rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .header__nav.is-open {
+    display: flex;
+    animation: dfMenuAbre 0.25s ease-out;
+  }
+
+  .header__nav-link {
+    padding: 0.75rem 1rem;
+    width: 100%;
+    border-radius: var(--df-radius-sm);
+    font-size: 1rem;
+  }
+
+  .header__nav-link--cta {
+    margin-left: 0;
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+
+  .footer__inner {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .footer__links {
+    justify-content: center;
+    gap: 1rem;
+  }
+}

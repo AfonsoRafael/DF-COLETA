@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pontos de Coleta – Admin DF Coleta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="../../js/tema.js"></script>
+  <link rel="stylesheet" href="../../css/admin.css" />
+  <style>
+    /* Estilos complementares desta tela */
+    .residuos-tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-width: 280px;
+    }
+    .residuos-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 8px 4px;
+      border: 1px solid var(--admin-card-border);
+      border-radius: var(--admin-radius-sm, 8px);
+      background: var(--admin-neutral-bg);
+    }
+    .residuo-check-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: var(--admin-card-bg);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--admin-card-border);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .residuo-check-label:hover {
+      border-color: var(--admin-primary);
+      background: var(--admin-primary-light);
+    }
+    .residuo-check-label input:checked + span {
+      font-weight: 600;
+      color: var(--admin-primary);
+    }
+    .btn-acao-perigo:hover {
+      background-color: var(--admin-danger-bg) !important;
+      color: var(--admin-danger-text) !important;
+      border-color: var(--admin-danger-border) !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay Drawer Mobile -->
+  <div class="admin-sidebar-overlay" onclick="fecharSidebar()"></div>
+
+  <!-- Toast de Notificações -->
+  <div id="toastNotificacao" class="admin-toast" role="status" aria-live="polite">
+    <i id="toastIcone" data-lucide="check-circle-2"></i>
+    <span id="toastMensagem">Mensagem aqui</span>
+  </div>
+
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar__logo">
+        <a href="dashboard.html" class="admin-sidebar__brand">
+          <div class="admin-sidebar__brand-icon"><i data-lucide="recycle"></i></div>
+          <div class="admin-sidebar__brand-text">
+            <span class="admin-sidebar__brand-title">DF Coleta</span>
+            <span class="admin-sidebar__brand-badge">Painel Admin</span>
+          </div>
+        </a>
+        <button class="admin-sidebar__close-btn" onclick="fecharSidebar()" aria-label="Fechar menu">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <nav class="admin-sidebar__nav">
+        <div class="admin-sidebar__nav-section-title">Menu Principal</div>
+        <a href="dashboard.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="layout-dashboard"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a href="pontos.html" class="admin-sidebar__nav-item admin-sidebar__nav-item--ativo">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="map-pin"></i></span>
+          <span>Pontos de Coleta</span>
+        </a>
+        <a href="residuos.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="recycle"></i></span>
+          <span>Resíduos</span>
+        </a>
+
+        <div class="admin-sidebar__nav-section-title">Moderação</div>
+        <a href="comentarios.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="message-square"></i></span>
+          <span>Comentários</span>
+        </a>
+        <a href="problemas.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="alert-triangle"></i></span>
+          <span>Problemas</span>
+        </a>
+        <a href="sugestoes.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="lightbulb"></i></span>
+          <span>Sugestões</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="../../index.html" class="admin-sidebar__nav-item">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="arrow-left"></i></span>
+          <span>Voltar ao site</span>
+        </a>
+        <button onclick="logout()" class="admin-sidebar__nav-item admin-sidebar__nav-item--logout">
+          <span class="admin-sidebar__nav-icon"><i data-lucide="log-out"></i></span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar__left">
+          <button class="admin-topbar__menu-btn admin-topbar__toggle" onclick="toggleSidebar()" aria-label="Abrir menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="admin-topbar__title-group">
+            <h1 class="admin-topbar__titulo admin-topbar__title">Pontos de Coleta</h1>
+            <span class="admin-topbar__subtitle">Gerencie os pontos de entrega voluntária e locais cadastrados no DF</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar__acoes admin-topbar__right">
+          <button class="admin-btn" onclick="abrirModalCriar()">
+            <i data-lucide="plus"></i>
+            <span>Novo Ponto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Cards de Estatísticas Rápidas -->
+        <div class="admin-stat-grid admin-stat-grid--4">
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Total de Pontos</span>
+              <span class="admin-stat-card__value" id="statTotalPontos">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="map-pin"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Pontos Ativos</span>
+              <span class="admin-stat-card__value" id="statPontosAtivos">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--verde">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Pontos Inativos</span>
+              <span class="admin-stat-card__value" id="statPontosInativos">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--amarelo">
+              <i data-lucide="pause-circle"></i>
+            </div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-card__info">
+              <span class="admin-stat-card__label">Cidades Atendidas</span>
+              <span class="admin-stat-card__value" id="statCidades">–</span>
+            </div>
+            <div class="admin-stat-card__icon admin-stat-card__icon--azul">
+              <i data-lucide="building-2"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Busca e Filtros -->
+        <div class="filtros-card">
+          <div class="filtros-grid">
+            <div class="busca-wrapper">
+              <i data-lucide="search"></i>
+              <input 
+                type="text" 
+                id="inputBusca" 
+                class="admin-input" 
+                placeholder="Buscar por nome ou endereço..." 
+                oninput="aoDigitarBusca()"
+              />
+              <button class="btn-limpar-busca" id="btnLimparBusca" onclick="limparBusca()" title="Limpar busca">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
+
+            <select id="filtroCidade" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todas as Cidades / RAs</option>
+            </select>
+
+            <select id="filtroResiduo" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todos os Resíduos</option>
+            </select>
+
+            <select id="filtroStatus" class="admin-select" onchange="aplicarFiltros()">
+              <option value="">Todos os Status</option>
+              <option value="ATIVO">Somente Ativos</option>
+              <option value="INATIVO">Somente Inativos</option>
+            </select>
+
+            <button class="admin-btn admin-btn--secundario" onclick="resetarFiltros()" title="Limpar todos os filtros">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Limpar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Pontos -->
+        <div class="admin-card">
+          <div class="admin-card__header">
+            <div class="admin-card__title-box">
+              <h2 class="admin-card__title">
+                <i data-lucide="list"></i>
+                <span>Pontos Cadastrados</span>
+              </h2>
+              <span class="admin-card__subtitle" id="labelContagemResultados">Carregando registros...</span>
+            </div>
+          </div>
+
+          <div class="admin-lista" id="listaPontos">
+            <!-- Skeleton Loading inicial -->
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 180px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 60%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 40%; margin-top: 8px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 150px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 55%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 35%; margin-top: 8px;"></div>
+            </div>
+            <div class="admin-item">
+              <div class="admin-skeleton admin-skeleton-title" style="width: 200px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 50%; margin-top: 12px;"></div>
+              <div class="admin-skeleton admin-skeleton-text" style="width: 45%; margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Criar / Editar Ponto -->
+  <div class="admin-modal" id="modalPonto">
+    <div class="admin-modal__box">
+      <div class="admin-modal__header">
+        <h3 class="admin-modal__title" id="modalPontoTitulo">Novo Ponto de Coleta</h3>
+        <button class="admin-modal__close" onclick="fecharModalPonto()" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="formPonto" onsubmit="salvarPonto(event)">
+        <input type="hidden" id="pontoId" />
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="pontoNome">Nome do Local *</label>
+          <input 
+            type="text" 
+            id="pontoNome" 
+            class="admin-input" 
+            required 
+            placeholder="Ex: Ecoponto Asa Norte" 
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="pontoTipo">Tipo de Estabelecimento *</label>
+          <select id="pontoTipo" class="admin-select" required>
+            <option value="ECOPONTO">Ecoponto</option>
+            <option value="COOPERATIVA">Cooperativa de Catadores</option>
+            <option value="FARMACIA">Farmácia</option>
+            <option value="COMERCIO">Comércio / Supermercado</option>
+            <option value="COMUNITARIO">Ponto Comunitário</option>
+            <option value="ESCOLA">Escola / Instituição</option>
+          </select>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="pontoEndereco">Endereço Completo *</label>
+          <input 
+            type="text" 
+            id="pontoEndereco" 
+            class="admin-input" 
+            required 
+            placeholder="Ex: SCLN 407, Bloco A" 
+          />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="admin-form-group">
+            <label class="admin-label" for="pontoCidade">Cidade / Região Adm. *</label>
+            <input 
+              type="text" 
+              id="pontoCidade" 
+              class="admin-input" 
+              required 
+              placeholder="Ex: Plano Piloto" 
+            />
+          </div>
+
+          <div class="admin-form-group">
+            <label class="admin-label" for="pontoTelefone">Telefone / Contato</label>
+            <input 
+              type="text" 
+              id="pontoTelefone" 
+              class="admin-input" 
+              placeholder="(61) 3321-1000" 
+            />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="admin-form-group">
+            <label class="admin-label" for="pontoLatitude">Latitude</label>
+            <input 
+              type="number" 
+              id="pontoLatitude" 
+              class="admin-input" 
+              step="any" 
+              placeholder="-15.7442" 
+            />
+          </div>
+
+          <div class="admin-form-group">
+            <label class="admin-label" for="pontoLongitude">Longitude</label>
+            <input 
+              type="number" 
+              id="pontoLongitude" 
+              class="admin-input" 
+              step="any" 
+              placeholder="-47.8825" 
+            />
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label" for="pontoStatus">Status do Ponto *</label>
+          <select id="pontoStatus" class="admin-select" required>
+            <option value="ATIVO">ATIVO (Visível no mapa público)</option>
+            <option value="INATIVO">INATIVO (Oculto temporariamente)</option>
+          </select>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label">Resíduos Aceitos</label>
+          <div class="residuos-checkbox-grid" id="listaCheckboxesResiduos">
+            <span style="font-size: 0.8rem; color: var(--admin-text-light); padding: 4px;">Carregando categorias...</span>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-label">Horários de Funcionamento</label>
+          <p style="font-size: 0.78rem; color: var(--admin-text-light); margin-bottom: 8px;">
+            Usado para informar quando o ponto está aberto. Deixe vazio se o ponto funciona 24h.
+          </p>
+          <div id="listaHorarios" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          <button
+            type="button"
+            class="admin-btn admin-btn--secundario admin-btn--sm"
+            onclick="adicionarHorario()"
+            style="margin-top: 8px;"
+          >
+            <i data-lucide="plus"></i> Adicionar horário
+          </button>
+        </div>
+
+        <div class="admin-modal__footer">
+          <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalPonto()">
+            Cancelar
+          </button>
+          <button type="submit" class="admin-btn" id="btnSalvarPonto">
+            <i data-lucide="save"></i>
+            <span id="btnSalvarPontoTexto">Salvar Ponto</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div class="admin-modal" id="modalExclusao">
+    <div class="admin-modal__box" style="max-width: 440px; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+        <div style="width: 54px; height: 54px; border-radius: 50%; background: var(--admin-danger-bg); color: var(--admin-danger-text); display: flex; align-items: center; justify-content: center;">
+          <i data-lucide="alert-triangle" style="width: 28px; height: 28px;"></i>
+        </div>
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Confirmar Exclusão</h3>
+      <p style="font-size: 0.88rem; color: var(--admin-text-muted); line-height: 1.5; margin-bottom: 24px;">
+        Tem certeza que deseja remover o ponto <strong id="nomePontoExclusao"></strong>? Esta ação não pode ser desfeita.
+      </p>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="admin-btn admin-btn--secundario" onclick="fecharModalExclusao()">
+          Cancelar
+        </button>
+        <button type="button" class="admin-btn admin-btn--perigo" id="btnConfirmarExclusao" onclick="executarExclusao()">
+          <i data-lucide="trash-2"></i>
+          <span>Sim, Excluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../js/api.js"></script>
+  <script src="../../js/admin-base.js"></script>
+  <script>
+    verificarAuth();
+
+    const API = DF_API_BASE;
+    let todosPontos = [];
+    let todosResiduos = [];
+    let pontoIdParaExcluir = null;
+    let debounceBuscaTimer = null;
+
+    const ROTULOS_TIPO = {
+      ECOPONTO: 'Ecoponto',
+      COOPERATIVA: 'Cooperativa',
+      FARMACIA: 'Farmácia',
+      COMERCIO: 'Comércio',
+      COMUNITARIO: 'Ponto Comunitário',
+      ESCOLA: 'Escola',
+    };
+
+    // Toast de notificação
+    function mostrarToast(mensagem, tipo = 'sucesso') {
+      const toast = document.getElementById('toastNotificacao');
+      const texto = document.getElementById('toastMensagem');
+      const icone = document.getElementById('toastIcone');
+
+      texto.textContent = mensagem;
+      toast.className = `admin-toast admin-toast--${tipo} visivel`;
+
+      if (tipo === 'sucesso') {
+        icone.setAttribute('data-lucide', 'check-circle-2');
+      } else {
+        icone.setAttribute('data-lucide', 'alert-circle');
+      }
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('visivel');
+      }, 3500);
+    }
+
+    // Inicialização
+    async function inicializar() {
+      try {
+        await Promise.all([carregarResiduos(), carregarPontos()]);
+        popularFiltrosCidades();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro na inicialização:', err);
+        mostrarToast('Erro ao carregar dados do servidor', 'erro');
+      }
+    }
+
+    // Carregar Resíduos
+    async function carregarResiduos() {
+      try {
+        const res = await fetch(`${API}/residuos`);
+        todosResiduos = await res.json();
+        if (!Array.isArray(todosResiduos)) todosResiduos = [];
+
+        // Preenche o select de resíduos
+        const select = document.getElementById('filtroResiduo');
+        select.innerHTML = '<option value="">Todos os Resíduos</option>';
+        todosResiduos.forEach(r => {
+          select.innerHTML += `<option value="${r.id}">${esc(r.nome)}</option>`;
+        });
+
+        // Preenche os checkboxes do modal
+        const container = document.getElementById('listaCheckboxesResiduos');
+        container.innerHTML = todosResiduos.map(r => `
+          <label class="residuo-check-label">
+            <input type="checkbox" name="residuoCheck" value="${r.id}" />
+            <span>${esc(r.nome)}</span>
+          </label>
+        `).join('');
+
+      } catch (err) {
+        console.error('Erro ao buscar resíduos:', err);
+      }
+    }
+
+    // Carregar Pontos de Coleta
+    async function carregarPontos() {
+      try {
+        const res = await fetch(`${API}/pontos-coleta?todos=true`);
+        const data = await res.json();
+        todosPontos = Array.isArray(data) ? data : [];
+        aplicarFiltros();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro ao carregar pontos:', err);
+        document.getElementById('listaPontos').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon" style="background: var(--admin-danger-bg); color: var(--admin-danger-text);">
+              <i data-lucide="alert-circle"></i>
+            </div>
+            <div class="empty-state__title">Falha ao conectar com a API backend</div>
+            <div class="empty-state__desc">Verifique se o serviço está no ar e recarregue a página.</div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    // Popula o select de cidades baseado nos pontos existentes
+    function popularFiltrosCidades() {
+      const cidades = new Set();
+      todosPontos.forEach(p => {
+        if (p.cidade && p.cidade.trim()) cidades.add(p.cidade.trim());
+      });
+
+      const select = document.getElementById('filtroCidade');
+      const valorAtual = select.value;
+      select.innerHTML = '<option value="">Todas as Cidades / RAs</option>';
+      Array.from(cidades).sort().forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        if (c === valorAtual) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    // Atualiza cards estatísticos
+    function atualizarEstatisticas() {
+      const total = todosPontos.length;
+      const ativos = todosPontos.filter(p => p.status === 'ATIVO').length;
+      const inativos = total - ativos;
+      const cidadesUnicas = new Set(todosPontos.map(p => p.cidade).filter(Boolean)).size;
+
+      document.getElementById('statTotalPontos').textContent = total;
+      document.getElementById('statPontosAtivos').textContent = ativos;
+      document.getElementById('statPontosInativos').textContent = inativos;
+      document.getElementById('statCidades').textContent = cidadesUnicas;
+    }
+
+    // Debounce da busca
+    function aoDigitarBusca() {
+      const val = document.getElementById('inputBusca').value.trim();
+      document.getElementById('btnLimparBusca').style.display = val ? 'block' : 'none';
+      clearTimeout(debounceBuscaTimer);
+      debounceBuscaTimer = setTimeout(aplicarFiltros, 250);
+    }
+
+    function limparBusca() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      aplicarFiltros();
+    }
+
+    function resetarFiltros() {
+      document.getElementById('inputBusca').value = '';
+      document.getElementById('btnLimparBusca').style.display = 'none';
+      document.getElementById('filtroCidade').value = '';
+      document.getElementById('filtroResiduo').value = '';
+      document.getElementById('filtroStatus').value = '';
+      aplicarFiltros();
+    }
+
+    /** Escapa texto vindo da API antes de montar o HTML. */
+    function esc(valor) {
+      return String(valor == null ? '' : valor).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
+    // Filtra e renderiza a tabela
+    function aplicarFiltros() {
+      const termo = (document.getElementById('inputBusca').value || '').toLowerCase().trim();
+      const cidade = document.getElementById('filtroCidade').value;
+      const residuoId = document.getElementById('filtroResiduo').value;
+      const status = document.getElementById('filtroStatus').value;
+
+      const filtrados = todosPontos.filter(p => {
+        if (termo) {
+          const nomeMatch = (p.nome || '').toLowerCase().includes(termo);
+          const endMatch = (p.endereco || '').toLowerCase().includes(termo);
+          if (!nomeMatch && !endMatch) return false;
+        }
+
+        if (cidade && (p.cidade || '').toLowerCase() !== cidade.toLowerCase()) {
+          return false;
+        }
+
+        if (status && p.status !== status) {
+          return false;
+        }
+
+        if (residuoId) {
+          const temResiduo = (p.residuos || []).some(r => String(r.id) === String(residuoId));
+          if (!temResiduo) return false;
+        }
+
+        return true;
+      });
+
+      renderizarTabela(filtrados);
+    }
+
+    // Renderiza linhas da tabela
+    function renderizarTabela(lista) {
+      const container = document.getElementById('listaPontos');
+      const label = document.getElementById('labelContagemResultados');
+
+      label.textContent = `Exibindo ${lista.length} de ${todosPontos.length} ponto(s) cadastrado(s)`;
+
+      if (lista.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state__icon">
+              <i data-lucide="map-pin-off"></i>
+            </div>
+            <div class="empty-state__title">Nenhum ponto encontrado</div>
+            <div class="empty-state__desc">Tente ajustar seus termos de pesquisa ou remover os filtros aplicados.</div>
+            <button class="admin-btn admin-btn--secundario admin-btn--sm" onclick="resetarFiltros()" style="margin-top: 8px;">
+              Limpar Filtros
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = lista.map(p => {
+        const isAtivo = p.status === 'ATIVO';
+        const badgeClass = isAtivo ? 'admin-badge--ativo' : 'admin-badge--inativo';
+        const statusTexto = isAtivo ? 'ATIVO' : 'INATIVO';
+
+        // Pílulas de resíduos aceitos (mostra até 5, o resto vira "+N")
+        const listaResiduos = Array.isArray(p.residuos) ? p.residuos : [];
+        const tagsResiduos = listaResiduos.length > 0
+          ? listaResiduos.slice(0, 5).map(r => `<span class="admin-tag-pill">${esc(r.nome)}</span>`).join('') +
+            (listaResiduos.length > 5
+              ? `<span class="admin-tag-pill" title="${esc(listaResiduos.slice(5).map(r => r.nome).join(', '))}">+${listaResiduos.length - 5}</span>`
+              : '')
+          : '<span class="admin-tag-pill">Nenhum resíduo cadastrado</span>';
+
+        return `
+          <article class="admin-item">
+            <div class="admin-item__topo">
+              <div>
+                <span class="admin-item__titulo">${esc(p.nome)}</span>
+                <span class="admin-item__id">#${p.id}</span>
+                <div class="admin-item__desc">${esc(p.endereco || 'Endereço não informado')}</div>
+              </div>
+              <span class="admin-badge ${badgeClass}">${statusTexto}</span>
+            </div>
+
+            <div class="admin-item__meta">
+              <span><i data-lucide="map"></i> ${esc(p.cidade || 'Distrito Federal')}</span>
+              <span><i data-lucide="building-2"></i> ${ROTULOS_TIPO[p.tipo] || 'Ecoponto'}</span>
+              <span><i data-lucide="clock"></i> ${(Array.isArray(p.horarios_funcionamento) ? p.horarios_funcionamento.length : 0)} horário(s)</span>
+              ${p.telefone ? `<span><i data-lucide="phone"></i> ${esc(p.telefone)}</span>` : ''}
+            </div>
+
+            <div class="admin-item__tags">${tagsResiduos}</div>
+
+            <div class="admin-item__acoes">
+              <button class="admin-btn admin-btn--sm admin-btn--secundario" onclick="abrirModalEditar(${p.id})">
+                <i data-lucide="pencil"></i> Editar
+              </button>
+              <button
+                class="admin-btn admin-btn--sm admin-btn--secundario"
+                onclick="alternarStatusPonto(${p.id}, '${isAtivo ? 'INATIVO' : 'ATIVO'}')"
+              >
+                <i data-lucide="${isAtivo ? 'toggle-right' : 'toggle-left'}"></i> ${isAtivo ? 'Desativar' : 'Ativar'}
+              </button>
+              <button class="admin-btn admin-btn--sm admin-btn--secundario btn-acao-perigo" onclick="solicitarExclusao(${p.id})">
+                <i data-lucide="trash-2"></i> Excluir
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Modal Criar / Editar
+    function abrirModalCriar() {
+      document.getElementById('modalPontoTitulo').textContent = 'Novo Ponto de Coleta';
+      document.getElementById('btnSalvarPontoTexto').textContent = 'Salvar Ponto';
+      document.getElementById('pontoId').value = '';
+      document.getElementById('formPonto').reset();
+      document.getElementById('pontoStatus').value = 'ATIVO';
+      document.getElementById('pontoTipo').value = 'ECOPONTO';
+
+      // Desmarca checkboxes
+      document.querySelectorAll('#listaCheckboxesResiduos input[type="checkbox"]').forEach(c => c.checked = false);
+
+      limparHorarios();
+
+      document.getElementById('modalPonto').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function abrirModalEditar(id) {
+      const p = todosPontos.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('modalPontoTitulo').textContent = `Editar Ponto #${p.id}`;
+      document.getElementById('btnSalvarPontoTexto').textContent = 'Atualizar Ponto';
+      document.getElementById('pontoId').value = p.id;
+      document.getElementById('pontoNome').value = p.nome || '';
+      document.getElementById('pontoEndereco').value = p.endereco || '';
+      document.getElementById('pontoCidade').value = p.cidade || '';
+      document.getElementById('pontoTelefone').value = p.telefone || '';
+      document.getElementById('pontoLatitude').value = p.latitude ?? '';
+      document.getElementById('pontoLongitude').value = p.longitude ?? '';
+      document.getElementById('pontoStatus').value = p.status || 'ATIVO';
+      document.getElementById('pontoTipo').value = p.tipo || 'ECOPONTO';
+
+      // Marca resíduos que pertencem ao ponto
+      const idsResiduosPonto = new Set((p.residuos || []).map(r => String(r.id)));
+      document.querySelectorAll('#listaCheckboxesResiduos input[type="checkbox"]').forEach(c => {
+        c.checked = idsResiduosPonto.has(String(c.value));
+      });
+
+      // Carrega horários existentes
+      limparHorarios();
+      const horarios = Array.isArray(p.horarios_funcionamento)
+        ? p.horarios_funcionamento
+        : (Array.isArray(p.horariosFuncionamento) ? p.horariosFuncionamento : []);
+      horarios.forEach(h => adicionarHorario(h));
+
+      document.getElementById('modalPonto').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalPonto() {
+      document.getElementById('modalPonto').classList.remove('aberto');
+    }
+
+    // ===== Horários de funcionamento =====
+    function limparHorarios() {
+      const lista = document.getElementById('listaHorarios');
+      if (!lista) return;
+      lista.innerHTML = '<p class="horario-vazio" style="font-size: 0.8rem; color: var(--admin-text-light); margin: 0;">Nenhum horário cadastrado.</p>';
+    }
+
+    function adicionarHorario(horario = {}) {
+      const lista = document.getElementById('listaHorarios');
+      if (!lista) return;
+
+      const vazio = lista.querySelector('.horario-vazio');
+      if (vazio) vazio.remove();
+
+      const linha = document.createElement('div');
+      linha.className = 'horario-linha';
+      linha.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px; align-items: center;';
+
+      const dia = document.createElement('input');
+      dia.type = 'text';
+      dia.className = 'admin-input horario-dia';
+      dia.placeholder = 'Segunda a Sexta';
+      dia.setAttribute('aria-label', 'Dia da semana');
+      dia.style.cssText = 'flex: 1 1 130px; min-width: 0;';
+      dia.value = horario.dia_semana || '';
+
+      const abertura = document.createElement('input');
+      abertura.type = 'time';
+      abertura.className = 'admin-input horario-abertura';
+      abertura.setAttribute('aria-label', 'Hora de abertura');
+      abertura.style.cssText = 'flex: 0 0 96px;';
+      abertura.value = horario.hora_abertura || '';
+
+      const fechamento = document.createElement('input');
+      fechamento.type = 'time';
+      fechamento.className = 'admin-input horario-fechamento';
+      fechamento.setAttribute('aria-label', 'Hora de fechamento');
+      fechamento.style.cssText = 'flex: 0 0 96px;';
+      fechamento.value = horario.hora_fechamento || '';
+
+      const remover = document.createElement('button');
+      remover.type = 'button';
+      remover.className = 'admin-btn admin-btn--sm admin-btn--secundario';
+      remover.setAttribute('aria-label', 'Remover horário');
+      remover.style.flex = '0 0 40px';
+      remover.innerHTML = '<i data-lucide="trash-2"></i>';
+      remover.addEventListener('click', () => {
+        linha.remove();
+        if (!lista.querySelector('.horario-linha')) limparHorarios();
+      });
+
+      linha.append(dia, abertura, fechamento, remover);
+      lista.appendChild(linha);
+      lucide.createIcons();
+    }
+
+    function lerHorarios() {
+      return Array.from(document.querySelectorAll('#listaHorarios .horario-linha'))
+        .map((linha, indice) => ({
+          id: indice + 1,
+          dia_semana: (linha.querySelector('.horario-dia')?.value || '').trim(),
+          hora_abertura: linha.querySelector('.horario-abertura')?.value || '',
+          hora_fechamento: linha.querySelector('.horario-fechamento')?.value || '',
+        }))
+        .filter((h) => h.dia_semana || h.hora_abertura || h.hora_fechamento);
+    }
+
+    // Salvar Ponto (POST / PUT)
+    async function salvarPonto(e) {
+      e.preventDefault();
+      const id = document.getElementById('pontoId').value;
+      const btn = document.getElementById('btnSalvarPonto');
+      const btnTexto = document.getElementById('btnSalvarPontoTexto');
+
+      // Coleta resíduos selecionados
+      const residuosSelecionados = [];
+      document.querySelectorAll('#listaCheckboxesResiduos input[type="checkbox"]:checked').forEach(c => {
+        const residuo = todosResiduos.find(r => String(r.id) === String(c.value));
+        if (residuo) residuosSelecionados.push(residuo);
+      });
+
+      const dto = {
+        nome: document.getElementById('pontoNome').value.trim(),
+        endereco: document.getElementById('pontoEndereco').value.trim(),
+        cidade: document.getElementById('pontoCidade').value.trim(),
+        telefone: document.getElementById('pontoTelefone').value.trim() || null,
+        latitude: parseFloat(document.getElementById('pontoLatitude').value) || -15.7942,
+        longitude: parseFloat(document.getElementById('pontoLongitude').value) || -47.8825,
+        status: document.getElementById('pontoStatus').value,
+        tipo: document.getElementById('pontoTipo').value,
+        residuos: residuosSelecionados,
+        horarios_funcionamento: lerHorarios()
+      };
+
+      btn.disabled = true;
+      btnTexto.textContent = 'Salvando...';
+
+      try {
+        const url = id ? `${API}/pontos-coleta/${id}` : `${API}/pontos-coleta`;
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dto)
+        });
+
+        if (!res.ok) throw new Error('Falha ao salvar ponto na API');
+
+        mostrarToast(id ? 'Ponto atualizado com sucesso!' : 'Novo ponto cadastrado com sucesso!', 'sucesso');
+        fecharModalPonto();
+        await carregarPontos();
+        popularFiltrosCidades();
+      } catch (err) {
+        console.error('Erro ao salvar ponto:', err);
+        mostrarToast('Erro ao salvar ponto. Verifique os dados.', 'erro');
+      } finally {
+        btn.disabled = false;
+        btnTexto.textContent = id ? 'Atualizar Ponto' : 'Salvar Ponto';
+        lucide.createIcons();
+      }
+    }
+
+    // Alternar Status
+    async function alternarStatusPonto(id, novoStatus) {
+      try {
+        const res = await fetch(`${API}/pontos-coleta/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: novoStatus })
+        });
+
+        if (!res.ok) throw new Error('Falha ao alterar status');
+
+        // Atualização otimista local
+        const p = todosPontos.find(x => x.id === id);
+        if (p) p.status = novoStatus;
+
+        mostrarToast(`Status alterado para ${novoStatus}`, 'sucesso');
+        aplicarFiltros();
+        atualizarEstatisticas();
+      } catch (err) {
+        console.error('Erro ao alterar status:', err);
+        mostrarToast('Erro ao alterar status do ponto', 'erro');
+      }
+    }
+
+    // Confirmação e Exclusão
+    function solicitarExclusao(id) {
+      const p = todosPontos.find(x => x.id === id);
+      if (!p) return;
+
+      pontoIdParaExcluir = id;
+      document.getElementById('nomePontoExclusao').textContent = `"${p.nome}"`;
+      document.getElementById('modalExclusao').classList.add('aberto');
+      lucide.createIcons();
+    }
+
+    function fecharModalExclusao() {
+      document.getElementById('modalExclusao').classList.remove('aberto');
+      pontoIdParaExcluir = null;
+    }
+
+    async function executarExclusao() {
+      if (!pontoIdParaExcluir) return;
+      const btn = document.getElementById('btnConfirmarExclusao');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/pontos-coleta/${pontoIdParaExcluir}`, {
+          method: 'DELETE'
+        });
+
+        if (!res.ok) throw new Error('Falha ao excluir ponto');
+
+        mostrarToast('Ponto de coleta excluído com sucesso!', 'sucesso');
+        fecharModalExclusao();
+        await carregarPontos();
+        popularFiltrosCidades();
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        mostrarToast('Erro ao excluir ponto de coleta', 'erro');
+      } finally {
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    // Inicializa na carga
+    inicializar();
+  </script>
+</body>
+</html>
