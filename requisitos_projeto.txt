@@ -1,0 +1,30 @@
+1 - O usuário vai poder visualizar as informações sobre o projeto e seu objetivo.
+2 - O site apresenta os tipos de resíduos aceitos.
+3 - O site vai apresentar uma lista com os pontos de coleta cadastrados.
+4 - Apresentar os pontos de coleta em um mapa de acordo com a localização do dispositivo.
+5 - Pesquisar pontos de coleta por endereço.
+6 - Pesquisar pontos de coleta por nome.
+7 - Filtrar pontos pelo tipo de resíduo.
+8 - Filtrar pontos por cidade.
+9 - Filtrar por estabelecimento.
+10 - Visualizar os dados de um ponto de coleta.
+11 - Apresentar o endereço do ponto de coleta.
+12 - Apresentar os horários de funcionamento caso o ponto esteja em um estabelecimento.
+13 - O site apresentar os tipos de resíduos recebidos pelo ponto de coleta escolhido.
+14 - Apresentar telefone ou contato, quando disponível.
+15 - Visualizar a localização do ponto no Google Maps.
+16 - Ordenar pontos por proximidade.
+17 - O administrador terá acesso à uma página oculta para controle do site.
+18 - Administrador vai poder cadastrar pontos de coleta.
+19 - Administrador vai poder editar pontos de coleta.
+20 - Administrador poderá excluir pontos de coleta.
+21 - Administrador poderá cadastrar tipos de resíduos.
+22 - Administrador poderá editar tipos de resíduos.
+23 - Administrador poderá excluir tipos de resíduos.
+24 - Administrador poderá cadastrar horários de funcionamento.
+25 - Administrador poderá ativar ou desativar pontos.
+26 - Administrador poderá visualizar a lista de pontos cadastrados.
+27 - Usuário pode deixar comentários sobre um ponto preenchendo um formulário.
+28 - Usuário pode informar problemas nas informações de um ponto preenchendo um formulário.
+29 - Usuário sugerir um novo ponto para análise do administrador preenchendo um formulário.
+30 - Administrador visualizar indicadores e dados do sistema em um painel.

@@ -1,0 +1,15 @@
+{
+  "name": "df-coleta",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DF Coleta — pontos de coleta seletiva no Distrito Federal",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm --prefix backend ci && npm --prefix backend run build:vercel",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "dev:frontend": "npx --yes serve frontend -l 5500",
+    "build:vercel": "npm --prefix backend run build:vercel"
+  }
+}
