@@ -1,0 +1,13 @@
+﻿{
+    "modoBackend":  "auto",
+    "estiloQr":  "normal",
+    "abrirAoIniciar":  true,
+    "ipEscolhido":  "",
+    "backend":  {
+                    "pid":  580,
+                    "modo":  "externo"
+                },
+    "frontend":  {
+                     "pid":  26932
+                 }
+}

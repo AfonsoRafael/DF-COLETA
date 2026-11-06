@@ -1,0 +1,13 @@
+{
+  "name": "df-coleta-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ferramentas locais do DF Coleta: servidor estático do frontend e gerador de QR Code.",
+  "scripts": {
+    "frontend": "node servidor.js 5500 ../frontend",
+    "qr": "node qr.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}
