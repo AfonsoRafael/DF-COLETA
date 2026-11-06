@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Nova Home do DF Coleta</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="js/tema.js"></script>
+  <link rel="stylesheet" href="css/tokens.css" />
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--df-font);
+      background: var(--df-bg);
+      color: var(--df-text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    .muted { color: var(--df-text-soft); }
+
+    /* ---------- HEADER ---------- */
+    .site-header {
+      position: sticky; top: 0; z-index: 60;
+      background: var(--df-glass);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--df-border);
+    }
+    .site-header__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; height: 66px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; }
+    .brand__icon {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: var(--df-primary); color: #fff;
+      display: grid; place-items: center;
+      box-shadow: var(--df-shadow-sm);
+    }
+    .brand__icon svg { width: 20px; height: 20px; }
+    .nav { display: none; gap: 4px; }
+    .nav a {
+      padding: 8px 14px; border-radius: 10px; font-size: .92rem; font-weight: 500;
+      color: var(--df-text-soft); transition: all var(--df-transition);
+    }
+    .nav a:hover { color: var(--df-primary); background: var(--df-primary-soft); }
+    .nav a.ativo { color: var(--df-primary); font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-round {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: grid; place-items: center; cursor: pointer;
+      background: transparent; border: 1px solid var(--df-border); color: var(--df-text-soft);
+      transition: all var(--df-transition);
+    }
+    .icon-round:hover { color: var(--df-primary); border-color: var(--df-primary-border); background: var(--df-primary-soft); }
+    .icon-round svg { width: 20px; height: 20px; }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      position: relative; overflow: hidden; text-align: center;
+      padding: 64px 0 56px;
+      background:
+        radial-gradient(1000px 420px at 50% -120px, var(--df-primary-soft) 0%, transparent 70%),
+        var(--df-bg);
+      border-bottom: 1px solid var(--df-border);
+    }
+    .hero__badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--df-primary-soft); color: var(--df-primary);
+      border: 1px solid var(--df-primary-border);
+      padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 600;
+    }
+    .hero__badge svg { width: 14px; height: 14px; }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.35rem); line-height: 1.08;
+      letter-spacing: -.03em; margin: 18px 0 12px; font-weight: 800;
+    }
+    .hero h1 em { font-style: normal; color: var(--df-primary); }
+    .hero p.lead { max-width: 560px; margin: 0 auto; font-size: 1.05rem; color: var(--df-text-soft); }
+
+    .searchbar {
+      display: flex; align-items: center; gap: 8px; margin: 26px auto 0;
+      max-width: 660px; padding: 8px 8px 8px 16px;
+      background: var(--df-surface); border: 1px solid var(--df-border);
+      border-radius: 18px; box-shadow: var(--df-shadow);
+    }
+    .searchbar > svg { width: 20px; height: 20px; color: var(--df-text-muted); flex-shrink: 0; }
+    .searchbar input {
+      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+      font: inherit; font-size: 1rem; color: var(--df-text); padding: 8px 0;
+    }
+    .searchbar input::placeholder { color: var(--df-text-muted); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: none; cursor: pointer; font: inherit; font-weight: 600;
+      padding: 12px 20px; border-radius: 13px; transition: all var(--df-transition);
+      white-space: nowrap;
+    }
+    .btn svg { width: 18px; height: 18px; }
+    .btn--primary { background: var(--df-primary); color: #fff; box-shadow: var(--df-shadow-sm); }
+    .btn--primary:hover { background: var(--df-primary-hover); transform: translateY(-1px); }
+    .btn--ghost { background: var(--df-surface); color: var(--df-text); border: 1px solid var(--df-border); }
+    .btn--ghost:hover { border-color: var(--df-primary-border); color: var(--df-primary); }
+    .btn--accent { background: var(--df-accent); color: #fff; }
+    .btn--lg { padding: 14px 24px; font-size: 1rem; }
+
+    .hero__ctas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
+    .stats { display: flex; flex-wrap: wrap; gap: 22px; justify-content: center; margin-top: 30px; }
+    .stat { display: flex; align-items: center; gap: 8px; font-size: .86rem; color: var(--df-text-soft); }
+    .stat svg { width: 17px; height: 17px; color: var(--df-primary); }
+    .stat b { color: var(--df-text); font-weight: 700; }
+
+    /* ---------- SECTIONS ---------- */
+    section { padding: 56px 0; }
+    .sec-head { text-align: center; margin-bottom: 30px; }
+    .sec-head h2 { font-size: clamp(1.4rem, 4vw, 1.9rem); letter-spacing: -.02em; margin: 0 0 6px; font-weight: 800; }
+    .sec-head p { margin: 0; color: var(--df-text-soft); }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 6px; color: var(--df-primary);
+      font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
+    }
+    .eyebrow svg { width: 14px; height: 14px; }
+
+    /* categorias */
+    .cats {
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .cat {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+      padding: 20px 12px; background: var(--df-surface);
+      border: 1px solid var(--df-border); border-radius: var(--df-radius);
+      cursor: pointer; transition: all var(--df-transition);
+    }
+    .cat:hover { transform: translateY(-3px); border-color: var(--df-primary-border); box-shadow: var(--df-shadow); }
+    .cat__icon {
+      width: 46px; height: 46px; border-radius: 13px;
+      background: var(--df-primary-soft); color: var(--df-primary);
+      display: grid; place-items: center;
+    }
+    .cat__icon svg { width: 24px; height: 24px; }
+    .cat__nome { font-size: .86rem; font-weight: 600; }
+
+    /* como funciona */
+    .steps { display: grid; gap: 18px; grid-template-columns: 1fr; }
+    .step {
+      position: relative; padding: 24px; background: var(--df-surface);
+      border: 1px solid var(--df-border); border-radius: var(--df-radius);
+    }
+    .step__num {
+      width: 34px; height: 34px; border-radius: 10px; font-weight: 800;
+      background: var(--df-primary); color: #fff; display: grid; place-items: center; margin-bottom: 14px;
+    }
+    .step h3 { margin: 0 0 6px; font-size: 1.02rem; }
+    .step p { margin: 0; font-size: .9rem; color: var(--df-text-soft); }
+
+    /* mapa teaser */
+    .mapa-teaser {
+      position: relative; border-radius: var(--df-radius-lg); overflow: hidden;
+      border: 1px solid var(--df-border); box-shadow: var(--df-shadow);
+      min-height: 300px; display: grid; place-items: center;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 39px, var(--df-border) 39px 40px),
+        repeating-linear-gradient(90deg, transparent 0 39px, var(--df-border) 39px 40px),
+        linear-gradient(135deg, var(--df-surface-2), var(--df-surface));
+    }
+    .mapa-teaser::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(500px 240px at 50% 50%, transparent, var(--df-surface));
+    }
+    .pin {
+      position: absolute; width: 34px; height: 34px; border-radius: 50% 50% 50% 4px;
+      transform: rotate(-45deg); background: var(--df-primary); color: #fff;
+      display: grid; place-items: center; box-shadow: var(--df-shadow); z-index: 2;
+    }
+    .pin svg { width: 17px; height: 17px; transform: rotate(45deg); }
+    .pin--accent { background: var(--df-accent); }
+    .mapa-teaser__cta { position: relative; z-index: 3; text-align: center; padding: 24px; }
+    .mapa-teaser__cta h3 { margin: 0 0 6px; font-size: 1.25rem; }
+    .mapa-teaser__cta p { margin: 0 0 16px; color: var(--df-text-soft); font-size: .92rem; }
+
+    /* destaques */
+    .destaques { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    .ponto-card {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 18px; background: var(--df-surface);
+      border: 1px solid var(--df-border); border-radius: var(--df-radius);
+      transition: all var(--df-transition); cursor: pointer;
+    }
+    .ponto-card:hover { box-shadow: var(--df-shadow); transform: translateY(-2px); border-color: var(--df-primary-border); }
+    .ponto-card__icone {
+      width: 46px; height: 46px; flex-shrink: 0; border-radius: 13px;
+      background: var(--df-primary-soft); color: var(--df-primary); display: grid; place-items: center;
+    }
+    .ponto-card__icone svg { width: 24px; height: 24px; }
+    .ponto-card h3 { margin: 2px 0 4px; font-size: 1rem; }
+    .ponto-card p { margin: 0; font-size: .84rem; color: var(--df-text-soft); display: flex; align-items: center; gap: 5px; }
+    .ponto-card p svg { width: 14px; height: 14px; }
+    .ponto-card__dist {
+      margin-left: auto; flex-shrink: 0; font-size: .76rem; font-weight: 700;
+      color: var(--df-accent); background: var(--df-accent-soft); padding: 3px 9px; border-radius: 999px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .tag {
+      font-size: .7rem; font-weight: 500; padding: 2px 8px; border-radius: 7px;
+      background: var(--df-primary-soft); color: var(--df-primary); border: 1px solid var(--df-primary-border);
+    }
+
+    /* footer */
+    footer.site-footer {
+      border-top: 1px solid var(--df-border); background: var(--df-surface); padding: 40px 0;
+    }
+    .footer-grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 18px; }
+    .footer-links a { font-size: .88rem; color: var(--df-text-soft); transition: color var(--df-transition); }
+    .footer-links a:hover { color: var(--df-primary); }
+    .footer-copy { font-size: .84rem; color: var(--df-text-muted); }
+    .lock-link { display: inline-flex; align-items: center; gap: 5px; color: var(--df-text-muted); font-size: .8rem; }
+    .lock-link svg { width: 13px; height: 13px; }
+
+    /* ---------- OVERLAY DO MAPA ---------- */
+    .mapa-overlay {
+      position: fixed; inset: 0; z-index: 200; display: none;
+      flex-direction: column; background: var(--df-bg);
+    }
+    .mapa-overlay.aberto { display: flex; animation: sobe .28s cubic-bezier(.16,1,.3,1); }
+    @keyframes sobe { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    .mapa-overlay__top {
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+      background: var(--df-glass); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--df-border); z-index: 3;
+    }
+    .mapa-overlay__top .searchbar { margin: 0; flex: 1; box-shadow: var(--df-shadow-sm); border-radius: 14px; }
+    .mapa-overlay__body { flex: 1; display: flex; min-height: 0; position: relative; }
+    .mapa-fake {
+      flex: 1; position: relative;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 44px, var(--df-border) 44px 45px),
+        repeating-linear-gradient(90deg, transparent 0 44px, var(--df-border) 44px 45px),
+        linear-gradient(160deg, var(--df-surface-2), var(--df-bg));
+    }
+    .mapa-painel {
+      position: absolute; left: 16px; top: 16px; bottom: 16px; width: 340px;
+      max-width: calc(100% - 32px); background: var(--df-surface);
+      border: 1px solid var(--df-border); border-radius: var(--df-radius-lg);
+      box-shadow: var(--df-shadow-lg); display: flex; flex-direction: column; overflow: hidden;
+    }
+    .mapa-painel__head { padding: 16px 18px 12px; border-bottom: 1px solid var(--df-border); }
+    .mapa-painel__head h3 { margin: 0; font-size: 1.05rem; }
+    .mapa-painel__head p { margin: 2px 0 0; font-size: .78rem; color: var(--df-text-muted); }
+    .mapa-painel__lista { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .chip-row { display: flex; gap: 7px; overflow-x: auto; padding: 4px 0 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+      padding: 6px 13px; border-radius: 11px; font-size: .8rem; font-weight: 500;
+      background: var(--df-surface); border: 1.5px solid var(--df-border); color: var(--df-text-soft); cursor: pointer;
+    }
+    .chip svg { width: 14px; height: 14px; }
+    .chip--ativo { background: var(--df-primary); border-color: var(--df-primary); color: #fff; }
+    @media (max-width: 720px) {
+      .mapa-painel {
+        left: 0; right: 0; top: auto; bottom: 0; width: auto; max-width: none;
+        border-radius: 22px 22px 0 0; max-height: 58%;
+      }
+    }
+
+    /* responsivo */
+    @media (min-width: 768px) {
+      .nav { display: flex; }
+      .hero { padding: 88px 0 72px; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .destaques { grid-template-columns: repeat(3, 1fr); }
+      .cats { grid-template-columns: repeat(5, 1fr); }
+    }
+    @media (max-width: 767px) {
+      .hero h1 { font-size: 2.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a href="#" class="brand">
+        <span class="brand__icon"><i data-lucide="recycle"></i></span>
+        <span>DF Coleta</span>
+      </a>
+
+      <nav class="nav">
+        <a href="#" class="ativo">Início</a>
+        <a href="#como">Como funciona</a>
+        <a href="#pontos">Pontos</a>
+        <a href="#sobre">Sobre</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-round" title="Buscar"><i data-lucide="search"></i></button>
+        <button class="icon-round" data-toggle-tema title="Alternar tema"></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="hero__badge"><i data-lucide="leaf"></i> Reciclagem no Distrito Federal</span>
+      <h1>Descarte certo,<br /><em>mais perto de você</em></h1>
+      <p class="lead">Encontre o ponto de coleta ideal para cada tipo de resíduo — eletrônicos, pilhas, óleo, vidro e muito mais.</p>
+
+      <div class="searchbar">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="O que você quer descartar? Ex: pilhas, óleo, eletrônicos" />
+        <button class="btn btn--primary" onclick="abrirMapa()"><i data-lucide="map-pin"></i> Buscar</button>
+      </div>
+
+      <div class="hero__ctas">
+        <button class="btn btn--primary btn--lg" onclick="abrirMapa()"><i data-lucide="map"></i> Ver mapa</button>
+        <button class="btn btn--ghost btn--lg"><i data-lucide="list"></i> Ver todos os pontos</button>
+      </div>
+
+      <div class="stats">
+        <span class="stat"><i data-lucide="map-pin"></i> <b>42</b> pontos de coleta</span>
+        <span class="stat"><i data-lucide="building-2"></i> <b>8</b> cidades</span>
+        <span class="stat"><i data-lucide="layers"></i> <b>10</b> tipos de resíduo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORIAS ============ -->
+  <section id="categorias">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="recycle"></i> O que descartar</span>
+        <h2>O que você pode descartar</h2>
+        <p>Toque em uma categoria para ver os pontos que recebem esse resíduo.</p>
+      </div>
+      <div class="cats">
+        <div class="cat"><span class="cat__icon"><i data-lucide="monitor"></i></span><span class="cat__nome">Eletrônicos</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="battery-charging"></i></span><span class="cat__nome">Pilhas e Baterias</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="droplets"></i></span><span class="cat__nome">Óleo de Cozinha</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="package"></i></span><span class="cat__nome">Papel e Papelão</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="recycle"></i></span><span class="cat__nome">Plástico</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="wine"></i></span><span class="cat__nome">Vidro</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="wrench"></i></span><span class="cat__nome">Metal</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="pill"></i></span><span class="cat__nome">Medicamentos</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="lightbulb"></i></span><span class="cat__nome">Lâmpadas</span></div>
+        <div class="cat"><span class="cat__icon"><i data-lucide="tv"></i></span><span class="cat__nome">TVs</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMO FUNCIONA ============ -->
+  <section id="como" style="background: var(--df-surface); border-block: 1px solid var(--df-border);">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="sparkles"></i> Simples assim</span>
+        <h2>Como funciona</h2>
+        <p>Três passos para dar o destino certo ao seu resíduo.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step__num">1</div><h3>Procure</h3><p>Busque pelo resíduo ou pela sua região na barra de busca.</p></div>
+        <div class="step"><div class="step__num">2</div><h3>Escolha o ponto</h3><p>Veja os pontos mais próximos, com endereço e horários.</p></div>
+        <div class="step"><div class="step__num">3</div><h3>Faça o descarte</h3><p>Leve o material até o local. Pronto, você reciclou!</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MAPA (SOB DEMANDA) ============ -->
+  <section id="mapa-secao">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="map"></i> Explore</span>
+        <h2>Veja tudo no mapa</h2>
+        <p>O mapa abre quando você quiser — sem sair da página.</p>
+      </div>
+
+      <div class="mapa-teaser">
+        <span class="pin" style="left: 18%; top: 30%;"><i data-lucide="recycle"></i></span>
+        <span class="pin pin--accent" style="left: 62%; top: 22%;"><i data-lucide="battery-charging"></i></span>
+        <span class="pin" style="left: 72%; top: 62%;"><i data-lucide="pill"></i></span>
+        <span class="pin pin--accent" style="left: 32%; top: 68%;"><i data-lucide="droplets"></i></span>
+        <span class="pin" style="left: 48%; top: 46%;"><i data-lucide="monitor"></i></span>
+
+        <div class="mapa-teaser__cta">
+          <h3>Mapa interativo</h3>
+          <p>Filtre por resíduo e veja os pontos perto de você.</p>
+          <button class="btn btn--primary btn--lg" onclick="abrirMapa()"><i data-lucide="maximize-2"></i> Abrir mapa interativo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DESTAQUES ============ -->
+  <section id="pontos" style="background: var(--df-surface); border-block: 1px solid var(--df-border);">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow"><i data-lucide="map-pin"></i> Perto de você</span>
+        <h2>Pontos em destaque</h2>
+      </div>
+      <div class="destaques">
+        <div class="ponto-card">
+          <span class="ponto-card__icone"><i data-lucide="recycle"></i></span>
+          <div>
+            <h3>Ecoponto Asa Norte</h3>
+            <p><i data-lucide="map-pin"></i> SCLN 407, Bloco A · Plano Piloto</p>
+            <div class="tags"><span class="tag">Plástico</span><span class="tag">Vidro</span><span class="tag">Metal</span></div>
+          </div>
+          <span class="ponto-card__dist">2,3 km</span>
+        </div>
+        <div class="ponto-card">
+          <span class="ponto-card__icone"><i data-lucide="battery-charging"></i></span>
+          <div>
+            <h3>Ponto Taguatinga</h3>
+            <p><i data-lucide="map-pin"></i> QNM 12, Conjunto A · Taguatinga</p>
+            <div class="tags"><span class="tag">Pilhas</span><span class="tag">Eletrônicos</span></div>
+          </div>
+          <span class="ponto-card__dist">4,1 km</span>
+        </div>
+        <div class="ponto-card">
+          <span class="ponto-card__icone"><i data-lucide="droplets"></i></span>
+          <div>
+            <h3>Coleta de Óleo — Gama</h3>
+            <p><i data-lucide="map-pin"></i> Setor Central, Lote 5 · Gama</p>
+            <div class="tags"><span class="tag">Óleo</span><span class="tag">Medicamentos</span></div>
+          </div>
+          <span class="ponto-card__dist">7,8 km</span>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top: 26px;">
+        <button class="btn btn--ghost btn--lg"><i data-lucide="list"></i> Ver todos os pontos</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer" id="sobre">
+    <div class="wrap footer-grid">
+      <a href="#" class="brand">
+        <span class="brand__icon"><i data-lucide="recycle"></i></span>
+        <span>DF Coleta</span>
+      </a>
+      <div class="footer-links">
+        <a href="#">Sobre o Projeto</a>
+        <a href="#">Sugerir um Ponto</a>
+        <a href="#">Contato</a>
+      </div>
+      <div class="footer-copy">
+        DF Coleta © 2026 · Brasília, DF
+        <a href="#" class="lock-link" style="margin-left: 10px;" title="Área restrita"><i data-lucide="lock"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ OVERLAY DO MAPA ============ -->
+  <div class="mapa-overlay" id="mapaOverlay">
+    <div class="mapa-overlay__top">
+      <button class="icon-round" onclick="fecharMapa()" title="Voltar"><i data-lucide="arrow-left"></i></button>
+      <div class="searchbar">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Buscar ponto ou endereço..." />
+      </div>
+      <button class="icon-round" title="Filiar"><i data-lucide="sliders-horizontal"></i></button>
+    </div>
+
+    <div class="mapa-overlay__body">
+      <div class="mapa-fake">
+        <span class="pin" style="left: 24%; top: 22%;"><i data-lucide="recycle"></i></span>
+        <span class="pin pin--accent" style="left: 55%; top: 18%;"><i data-lucide="battery-charging"></i></span>
+        <span class="pin" style="left: 68%; top: 48%;"><i data-lucide="pill"></i></span>
+        <span class="pin pin--accent" style="left: 40%; top: 66%;"><i data-lucide="droplets"></i></span>
+        <span class="pin" style="left: 78%; top: 74%;"><i data-lucide="wine"></i></span>
+      </div>
+
+      <div class="mapa-painel">
+        <div class="mapa-painel__head">
+          <h3 id="mapaContador">42 pontos encontrados</h3>
+          <p>Ordenados por proximidade</p>
+          <div class="chip-row">
+            <button class="chip chip--ativo"><i data-lucide="layers"></i> Todos</button>
+            <button class="chip"><i data-lucide="monitor"></i> Eletrônicos</button>
+            <button class="chip"><i data-lucide="battery-charging"></i> Pilhas</button>
+            <button class="chip"><i data-lucide="droplets"></i> Óleo</button>
+          </div>
+        </div>
+        <div class="mapa-painel__lista">
+          <div class="ponto-card">
+            <span class="ponto-card__icone"><i data-lucide="recycle"></i></span>
+            <div><h3>Ecoponto Asa Norte</h3><p><i data-lucide="map-pin"></i> SCLN 407 · Plano Piloto</p></div>
+            <span class="ponto-card__dist">2,3 km</span>
+          </div>
+          <div class="ponto-card">
+            <span class="ponto-card__icone"><i data-lucide="battery-charging"></i></span>
+            <div><h3>Ponto Taguatinga</h3><p><i data-lucide="map-pin"></i> QNM 12 · Taguatinga</p></div>
+            <span class="ponto-card__dist">4,1 km</span>
+          </div>
+          <div class="ponto-card">
+            <span class="ponto-card__icone"><i data-lucide="droplets"></i></span>
+            <div><h3>Coleta de Óleo — Gama</h3><p><i data-lucide="map-pin"></i> Setor Central · Gama</p></div>
+            <span class="ponto-card__dist">7,8 km</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirMapa() {
+      document.getElementById('mapaOverlay').classList.add('aberto');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons();
+    }
+    function fecharMapa() {
+      document.getElementById('mapaOverlay').classList.remove('aberto');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharMapa(); });
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>

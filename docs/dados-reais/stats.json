@@ -1,0 +1,263 @@
+{
+  "geradoEm": "2026-11-03T01:35:39.413Z",
+  "total": 409,
+  "porTipo": {
+    "COMERCIO": 229,
+    "FARMACIA": 112,
+    "ESCOLA": 5,
+    "COOPERATIVA": 35,
+    "ECOPONTO": 28
+  },
+  "porCidade": {
+    "Plano Piloto": 123,
+    "Taguatinga": 33,
+    "Ceilândia": 31,
+    "SIA": 21,
+    "Guará": 20,
+    "Brazlândia": 5,
+    "Vicente Pires": 4,
+    "Águas Claras": 25,
+    "Planaltina": 8,
+    "Arniqueira": 4,
+    "Jardim Botânico": 3,
+    "Samambaia": 13,
+    "Lago Sul": 13,
+    "Sobradinho": 11,
+    "Recanto das Emas": 7,
+    "Gama": 17,
+    "Núcleo Bandeirante": 5,
+    "Sol Nascente/Por do Sol": 6,
+    "Santa Maria": 8,
+    "Sudoeste/Octogonal": 11,
+    "Lago Norte": 15,
+    "Riacho Fundo": 4,
+    "Sobradinho II": 3,
+    "Candangolândia": 2,
+    "Cruzeiro": 1,
+    "São Sebastião": 6,
+    "Varjão": 1,
+    "Paranoá": 4,
+    "SCIA": 4,
+    "Riacho Fundo II": 1
+  },
+  "porResiduo": {
+    "Lâmpadas": 46,
+    "Pilhas e Baterias": 188,
+    "Medicamentos": 28,
+    "Óleo de Cozinha": 37,
+    "Vidro": 107,
+    "Papel e Papelão": 59,
+    "Plástico": 59,
+    "Metal": 59,
+    "Eletrônicos": 53,
+    "TVs Analógicas": 53
+  },
+  "enderecoOficial": 119,
+  "enderecoAproximado": 290,
+  "semEndereco": 0,
+  "comTelefone": 289,
+  "comHorario": 337,
+  "contatosPlanilha": 333,
+  "coordenadasCorrigidas": 29,
+  "telefonePorTipo": {
+    "COMERCIO": "157/229",
+    "FARMACIA": "111/112",
+    "ESCOLA": "4/5",
+    "COOPERATIVA": "17/35",
+    "ECOPONTO": "0/28"
+  },
+  "descartados": [
+    {
+      "nome": "Cooperativa Brasil Ambiental",
+      "latitude": -15.7423313,
+      "longitude": -48.3439498,
+      "motivo": "fora do DF"
+    },
+    {
+      "nome": "Sabrila Reciclagem",
+      "latitude": -16.156042,
+      "longitude": -47.9576857,
+      "motivo": "fora do DF"
+    },
+    {
+      "nome": "Reciclagem do Edilson",
+      "latitude": -16.0952208,
+      "longitude": -48.0339721,
+      "motivo": "fora do DF"
+    },
+    {
+      "nome": "JUKAF FABRICA - GUARA II",
+      "latitude": -18.924454,
+      "longitude": -48.21248,
+      "motivo": "fora do DF"
+    },
+    {
+      "nome": "SECRETARIA DE ESTADO DO MEIO AMBIENTE DO DISTRITO FEDERAL",
+      "latitude": -19.044114,
+      "longitude": -40.540808,
+      "motivo": "fora do DF"
+    }
+  ],
+  "mesclados": [
+    {
+      "mantido": "Assaí Atacadista (SIA)",
+      "removido": "Assaí Atacadista (Guará)",
+      "metros": 99
+    },
+    {
+      "mantido": "Assaí Atacadista (Ceilândia)",
+      "removido": "Assaí Atacadista (Ceilândia)",
+      "metros": 94
+    },
+    {
+      "mantido": "Assaí Atacadista (Park Sul)",
+      "removido": "Assaí Atacadista (Guará)",
+      "metros": 0
+    },
+    {
+      "mantido": "Assaí Atacadista (Guará)",
+      "removido": "Assaí Atacadista (SIA)",
+      "metros": 1
+    },
+    {
+      "mantido": "Assaí Atacadista (Taguatinga)",
+      "removido": "Assaí Atacadista (Águas Claras)",
+      "metros": 0
+    },
+    {
+      "mantido": "Assaí Atacadista (Águas Claras)",
+      "removido": "Assaí Atacadista (Taguatinga)",
+      "metros": 168
+    },
+    {
+      "mantido": "Drogasil (Asa Norte)",
+      "removido": "Drogasil",
+      "metros": 6
+    },
+    {
+      "mantido": "Drogasil (Asa Norte)",
+      "removido": "Drogasil",
+      "metros": 10
+    },
+    {
+      "mantido": "Drogasil (Asa Norte)",
+      "removido": "Drogasil",
+      "metros": 6
+    },
+    {
+      "mantido": "Drogasil (Asa Norte)",
+      "removido": "Drogasil",
+      "metros": 6
+    },
+    {
+      "mantido": "Drogasil (Águas Claras)",
+      "removido": "Drogasil",
+      "metros": 6
+    },
+    {
+      "mantido": "Drogasil (Gama)",
+      "removido": "Drogasil",
+      "metros": 11
+    },
+    {
+      "mantido": "Drogasil (Asa Sul)",
+      "removido": "Drogasil",
+      "metros": 16
+    },
+    {
+      "mantido": "Drogasil (Núcleo Bandeirante)",
+      "removido": "Drogasil",
+      "metros": 6
+    },
+    {
+      "mantido": "Drogasil (Planaltina)",
+      "removido": "Drogasil",
+      "metros": 32
+    },
+    {
+      "mantido": "Drogasil (Lago Sul)",
+      "removido": "Drogasil",
+      "metros": 14
+    },
+    {
+      "mantido": "Droga Raia - Drogasil",
+      "removido": "Drogasil",
+      "metros": 0
+    },
+    {
+      "mantido": "Drogasil (Asa Sul)",
+      "removido": "Drogasil",
+      "metros": 40
+    },
+    {
+      "mantido": "Leroy Merlin Brasília (Guará)",
+      "removido": "Leroy Merlin Brasília",
+      "metros": 36
+    },
+    {
+      "mantido": "LOJA VIVO PARK SHOPPING",
+      "removido": "LOJA VIVO PARK SHOPPING",
+      "metros": 0
+    },
+    {
+      "mantido": "LOJA VIVO PATIO BRASIL SHOPPING",
+      "removido": "LOJA VIVO PATIO BRASIL SHOPPING",
+      "metros": 0
+    },
+    {
+      "mantido": "LOJA VIVO PARK SHOPPING",
+      "removido": "LOJA VIVO SHOPPING AGUAS CLARAS",
+      "metros": 0
+    },
+    {
+      "mantido": "LOJA VIVO CONJUNTO NACIONAL",
+      "removido": "LOJA VIVO SHOPPING CONJUNTO NACIONAL BRASILIA",
+      "metros": 0
+    },
+    {
+      "mantido": "LOJA VIVO TAGUATINGA SHOPPING",
+      "removido": "LOJA VIVO TAGUATINGA SHOPPING",
+      "metros": 0
+    },
+    {
+      "mantido": "Cooperativa CRV (Varjão)",
+      "removido": "CRV",
+      "metros": 73
+    },
+    {
+      "mantido": "Cooperativa Coopativa / Renascer",
+      "removido": "Renascer",
+      "metros": 3
+    },
+    {
+      "mantido": "Cooperativa Recicla Mais Brasil",
+      "removido": "Recicla Mais Brasil",
+      "metros": 16
+    },
+    {
+      "mantido": "Cooperativa Cooperdife (Sobradinho)",
+      "removido": "Cooperdife",
+      "metros": 2
+    },
+    {
+      "mantido": "Cooperativa ACOBRAZ (Brazlândia)",
+      "removido": "Acobraz",
+      "metros": 203
+    },
+    {
+      "mantido": "Cooperativa R3 (Santa Maria)",
+      "removido": "R3",
+      "metros": 11
+    },
+    {
+      "mantido": "Cooperativa Coopativa / Renascer",
+      "removido": "COOPATIVA",
+      "metros": 16
+    },
+    {
+      "mantido": "Cooperativa Sonho de Liberdade/ Coperfé / Cortrap / Deposito do Joel",
+      "removido": "SONHO DE LIBERDADE",
+      "metros": 71
+    }
+  ]
+}
